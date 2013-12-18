@@ -11,7 +11,7 @@ import jade.lang.acl.ACLMessage;
 public class PingAgent extends Agent {
 	
 	/**
-	 * 
+	 * Class de test
 	 */
 	private static final long serialVersionUID = 1L;
 	private AMSAgentDescription[] agents;
