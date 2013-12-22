@@ -6,3 +6,4 @@
 *.ear
 *.log
 *.log.lck
+*.log.*
