@@ -10,6 +10,7 @@
 <listEntry value="org.eclipse.debug.ui.launchGroup.run"/>
 </listAttribute>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="jade.Boot"/>
-<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-container -host localhost pa:sma.test.PingAgent"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-container -host localhost agent:sma.agent.AgentCommercial"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="JADE_SMA_Commercial"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Djava.util.logging.config.file=mylogging.properties"/>
 </launchConfiguration>
