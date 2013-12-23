@@ -30,14 +30,13 @@ public class SMAFormatter extends Formatter {
 			dateFormat = DateFormat.getDateTimeInstance();
 		
 		buf.append(record.getLevel());
-		buf.append(": ");
+		buf.append(":");
 		buf.append(dateFormat.format(new Date(record.getMillis())));
 		buf.append(' ');
 		buf.append(record.getSourceClassName());
 		buf.append(' ');
 		buf.append(record.getSourceMethodName());
 		buf.append(lineSep);
-		
 		
 		buf.append(formatMessage(record));
  

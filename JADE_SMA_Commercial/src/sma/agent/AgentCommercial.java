@@ -9,6 +9,9 @@ import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.util.Logger;
+import jade.wrapper.AgentContainer;
+import jade.wrapper.AgentController;
+import jade.wrapper.ControllerException;
 import sma.tools.Config;
 
 /**
@@ -31,6 +34,10 @@ public class AgentCommercial extends Agent {
 	
 	private float money;
 	private float satisfaction;
+	/**
+	 * Temps passé sans pouvoir consommé de produit
+	 */
+	private float famine;
 	
 	@Override
 	protected void setup() {
@@ -153,8 +160,11 @@ public class AgentCommercial extends Agent {
 	public void produce(float delta, float quantity){
 		float total = quantity * delta;
 		addStock_Product(total);
+		if(stock_production == stock_max_production){
+			//Augmentation de la satifaction
+		}
 		
-		logger.log(Logger.INFO, "Agent : "+this.getName()+", produce : "+total+" ("+quantity+" /sec)");
+		logger.log(Logger.INFO, "Agent : "+this.getName()+", produce :"+stock_production+"(+"+total+") (+"+quantity+" /sec)");
 	}
 	public void produce(float delta){
 		produce(delta, 1);
@@ -169,13 +179,50 @@ public class AgentCommercial extends Agent {
 		float total = quantity * delta;
 		removeStock_Consomme(total);
 		
-		logger.log(Logger.INFO, "Agent : "+this.getName()+", consomme : "+total+" ("+quantity+" /sec)");
+		logger.log(Logger.INFO, "Agent : "+this.getName()+", consomme :"+stock_consumption+"(-"+total+") (-"+quantity+" /sec)");
 	}
 	public void consomme(float delta){
 		consomme(delta, 1);
 	}
 	
-	//---------------------GETTER / SETTER------------------------------------------------------
+	
+	/**
+	 * Vérifie la satifaction et effectue les opérations nécéssaires
+	 */
+	public void check_satisfaction(float delta){
+		if(satisfaction <= 0.0){
+			logger.log(Logger.INFO, "Agent : "+this.getName()+", is starving to death !");
+			kill();
+		}
+		
+		if(satisfaction == 1.0){//TODO condition de Duplication ?
+			duplication();
+		}
+		
+		if(stock_consumption <= 0){
+			famine += delta;// * 1;
+			reduceSatifaction(delta);
+			logger.log(Logger.INFO, "Agent : "+this.getName()+", Famine increased to "+famine+" !");
+		}else{
+			famine = 0;
+		}
+	}
+	
+	//---------------------Private Methode------------------------------------------------------
+	
+	private void kill(){
+		AgentContainer c = getContainerController();
+		try {
+			AgentController ac = c.getAgent(this.getAID().getLocalName());
+			ac.kill();
+		} catch (ControllerException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private void duplication(){
+		//TODO
+	}
 	
 	/**
 	 * Ajoute des produits au stock de produit creé
@@ -183,7 +230,9 @@ public class AgentCommercial extends Agent {
 	 */
 	private void addStock_Product(float quantity){
 		stock_production += quantity;
-		if(stock_production > stock_max_production) stock_production = stock_max_production;
+		if(stock_production > stock_max_production){
+			stock_production = stock_max_production;
+		}
 	}
 	
 	/**
@@ -192,7 +241,9 @@ public class AgentCommercial extends Agent {
 	 */
 	private void removeStock_Product(float quantity){
 		stock_production -= quantity;
-		if(stock_production < 0) stock_production = 0;
+		if(stock_production < 0){
+			stock_production = 0;
+		}
 	}
 	
 	/**
@@ -201,7 +252,9 @@ public class AgentCommercial extends Agent {
 	 */
 	private void addStock_Consomme(float quantity){
 		stock_consumption += quantity;
-		if(stock_consumption > stock_max_consumption) stock_consumption = stock_max_consumption;
+		if(stock_consumption > stock_max_consumption){
+			stock_consumption = stock_max_consumption;
+		}
 	}
 	
 	/**
@@ -210,15 +263,32 @@ public class AgentCommercial extends Agent {
 	 */
 	private void removeStock_Consomme(float quantity){
 		stock_consumption -= quantity;
-		if(stock_consumption < 0) stock_consumption = 0;
+		if(stock_consumption < 0){
+			stock_consumption = 0;
+		}
 	}
 	
-	//----------------------ToString-----------------------------------------
+	/**
+	 * Reduit exponentiellement la satifaction
+	 * @param delta
+	 */
+	private void reduceSatifaction(float delta){ 
+		float reduction = (float) (delta * Math.pow(Config.CONST_REDUCE_SATIFACTION, famine)); //TODO
+		satisfaction -= reduction;
+	}
+	
+	//----------------------ToString-----------------------------------------------
 	
 	@Override
 	public String toString() {
-		String text = this.getName()+ " <"+this.getClass().getName()+"> : Produit : "+production+", Consomme : "+consumption;
-		return text;
+		return "AgentCommercial [production=" + production
+				+ ", stock_production=" + stock_production
+				+ ", stock_max_production=" + stock_max_production + ", price="
+				+ price + ", consumption=" + consumption
+				+ ", stock_consumption=" + stock_consumption
+				+ ", stock_max_consumption=" + stock_max_consumption
+				+ ", money=" + money + ", satisfaction=" + satisfaction
+				+ ", famine=" + famine + "]";
 	}
 	
 }
