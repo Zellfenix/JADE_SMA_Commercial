@@ -5,6 +5,8 @@ package sma.agent;
 
 import java.util.Date;
 
+import sma.tools.analyse.Analyse;
+
 import jade.core.Agent;
 import jade.core.behaviours.TickerBehaviour;
 import jade.util.Logger;
@@ -63,6 +65,9 @@ public class AgentCommercialBehviours extends TickerBehaviour {
 		 */
 		
 		last_update = new Date();
+		
+		//Met a jour les informations de la simulation
+		Analyse.getInstance().agent_update(myAgentCommercial);
 	}
 	
 	@Override

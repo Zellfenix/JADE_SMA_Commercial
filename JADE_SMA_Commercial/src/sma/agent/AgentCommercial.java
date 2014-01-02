@@ -13,6 +13,7 @@ import jade.wrapper.AgentContainer;
 import jade.wrapper.AgentController;
 import jade.wrapper.ControllerException;
 import sma.tools.Config;
+import sma.tools.analyse.Analyse;
 
 /**
  * @author Jérémy
@@ -42,6 +43,9 @@ public class AgentCommercial extends Agent {
 	@Override
 	protected void setup() {
 		super.setup();
+		
+		//Ajoute l'agent commercial au systeme d'analyse de la simulation
+		Analyse.getInstance().agent_setup(this);
 		
 		//Récupération de la classe de gestion des log de jade
 		logger = Logger.getMyLogger(this.getClass().getName());
@@ -192,7 +196,7 @@ public class AgentCommercial extends Agent {
 	public void check_satisfaction(float delta){
 		if(satisfaction <= 0.0){
 			logger.log(Logger.INFO, "Agent : "+this.getName()+", is starving to death !");
-			kill();
+			//kill(); //TODO
 		}
 		
 		if(satisfaction == 1.0){//TODO condition de Duplication ?
@@ -275,6 +279,48 @@ public class AgentCommercial extends Agent {
 	private void reduceSatifaction(float delta){ 
 		float reduction = (float) (delta * Math.pow(Config.CONST_REDUCE_SATIFACTION, famine)); //TODO
 		satisfaction -= reduction;
+	}
+	
+	//-----------------------GETTER------------------------------------------------
+	
+	public Products getConsumption() {
+		return consumption;
+	}
+	
+	public float getStock_consumption() {
+		return stock_consumption;
+	}
+	
+	public float getStock_max_consumption() {
+		return stock_max_consumption;
+	}
+	
+	public Products getProduction() {
+		return production;
+	}
+	
+	public float getStock_production() {
+		return stock_production;
+	}
+	
+	public float getStock_max_production() {
+		return stock_max_production;
+	}
+	
+	public float getPrice() {
+		return price;
+	}
+	
+	public float getSatisfaction() {
+		return satisfaction;
+	}
+	
+	public float getFamine() {
+		return famine;
+	}
+	
+	public float getMoney() {
+		return money;
 	}
 	
 	//----------------------ToString-----------------------------------------------
