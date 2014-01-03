@@ -24,7 +24,7 @@ public class AgentCommercial extends Agent {
 	private static final long serialVersionUID = 1L;
 	private Logger logger;
 	
-	public Products production;
+	private Products production;
 	private float stock_production;
 	private float stock_max_production;
 	private float price;
@@ -196,7 +196,7 @@ public class AgentCommercial extends Agent {
 	public void check_satisfaction(float delta){
 		if(satisfaction <= 0.0){
 			logger.log(Logger.INFO, "Agent : "+this.getName()+", is starving to death !");
-			//kill(); //TODO
+			kill();
 		}
 		
 		if(satisfaction == 1.0){//TODO condition de Duplication ?

@@ -4,6 +4,7 @@ import java.awt.Graphics;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JToolTip;
 
 import sma.agent.AgentCommercial;
 
@@ -18,6 +19,8 @@ public class AgentRepresentation extends JPanel{
 	private JLabel consumption_stock;
 	private JLabel money;
 	private JLabel name;
+	
+	private JToolTip tip;
 
 	public AgentRepresentation() {
 
