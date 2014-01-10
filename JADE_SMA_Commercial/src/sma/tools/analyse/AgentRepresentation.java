@@ -59,7 +59,7 @@ public class AgentRepresentation extends JPanel{
 	}
 	
 	public void update(AgentCommercial agentCommercial){
-		System.out.println("Mise a jour des informations de "+agentCommercial.getName());
+		//System.out.println("Mise a jour des informations de "+agentCommercial.getName());
 		
 		satifaction.setText(String.format("%.2f", agentCommercial.getSatisfaction()));
 		production.setText(""+agentCommercial.getProduction());

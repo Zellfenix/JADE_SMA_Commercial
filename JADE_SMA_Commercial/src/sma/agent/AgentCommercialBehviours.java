@@ -3,13 +3,13 @@
  */
 package sma.agent;
 
-import java.util.Date;
-
-import sma.tools.analyse.Analyse;
-
 import jade.core.Agent;
 import jade.core.behaviours.TickerBehaviour;
 import jade.util.Logger;
+
+import java.util.Date;
+
+import sma.tools.analyse.Analyse;
 
 /**
  * @author Jérémy
@@ -20,7 +20,11 @@ public class AgentCommercialBehviours extends TickerBehaviour {
 	private static final long serialVersionUID = 1L;
 	private java.util.logging.Logger logger;
 	private AgentCommercial myAgentCommercial;
+	private AgentCommercialBehvioursTransaction buyAgent;
+	
 	private static Date last_update; 
+	
+	
 	
 	public AgentCommercialBehviours(Agent a, long period) {
 		super(a, period);
@@ -37,7 +41,10 @@ public class AgentCommercialBehviours extends TickerBehaviour {
 	public void onStart() {
 		super.onStart();
 		//Message test de log
-		logger.log(Logger.INFO, "Entrée dans onStart."); 
+		logger.log(Logger.INFO, "Entrée dans onStart.");
+		
+		buyAgent = new AgentCommercialBehvioursTransaction(10); //TODO
+		myAgent.addBehaviour(buyAgent);
 		
 		last_update = new Date();
 	}
@@ -47,13 +54,15 @@ public class AgentCommercialBehviours extends TickerBehaviour {
 		float delta = (float) (((new Date()).getTime() - last_update.getTime()) / 1000.0);
 		
 		//Message test de log
-		logger.log(Logger.INFO, "Entrée dans onTick. delta="+delta); 
+		logger.log(Logger.FINE, "Entrée dans onTick. delta="+delta); 
 		
 		myAgentCommercial.produce(delta);
-		myAgentCommercial.consomme(delta);
+		//myAgentCommercial.consomme(delta);
+		//myAgentCommercial.check_satisfaction(delta);
 		
-		
-		myAgentCommercial.check_satisfaction(delta);
+		if(myAgentCommercial.getStock_consumption() < myAgentCommercial.getStock_max_consumption()* 2/3 && buyAgent.done()){
+			buyAgent.reset();
+		}
 		
 		//TODO Tache a effectuer
 		/* Produire
@@ -68,6 +77,10 @@ public class AgentCommercialBehviours extends TickerBehaviour {
 		
 		//Met a jour les informations de la simulation
 		Analyse.getInstance().agent_update(myAgentCommercial);
+		
+		
+		
+		
 	}
 	
 	@Override

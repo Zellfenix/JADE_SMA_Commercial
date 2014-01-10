@@ -9,9 +9,9 @@ import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.util.Logger;
-import jade.wrapper.AgentContainer;
-import jade.wrapper.AgentController;
-import jade.wrapper.ControllerException;
+
+import java.util.logging.Level;
+
 import sma.tools.Config;
 import sma.tools.analyse.Analyse;
 
@@ -59,7 +59,10 @@ public class AgentCommercial extends Agent {
 		
 		//Ajout des classe Behviours
 		addBehaviour(new AgentCommercialBehviours(this, Config.TICKER_DELAY));
+		addBehaviour(new AgentCommercialBehvioursListener());
 		
+		//TODO
+		//addBehaviour(new AgentCommercialBehvioursTransaction(1));
 	}
 
 	@Override
@@ -74,6 +77,10 @@ public class AgentCommercial extends Agent {
 	 */
 	public void init(){
 		Object[] args = getArguments();
+		if(args.length >= 2){
+			System.out.println((String)args[0]);
+			System.out.println((String)args[1]);
+		}
 		if(args != null && args.length > 2){
 		    String arg_production = (String)args[0];
 		    String arg_consommation = (String)args[1];
@@ -168,7 +175,7 @@ public class AgentCommercial extends Agent {
 			//Augmentation de la satifaction
 		}
 		
-		logger.log(Logger.INFO, "Agent : "+this.getName()+", produce :"+stock_production+"(+"+total+") (+"+quantity+" /sec)");
+		logger.log(Logger.FINE, "Agent : "+this.getName()+", produce :"+stock_production+"(+"+total+") (+"+quantity+" /sec)");
 	}
 	public void produce(float delta){
 		produce(delta, 1);
@@ -183,7 +190,7 @@ public class AgentCommercial extends Agent {
 		float total = quantity * delta;
 		removeStock_Consomme(total);
 		
-		logger.log(Logger.INFO, "Agent : "+this.getName()+", consomme :"+stock_consumption+"(-"+total+") (-"+quantity+" /sec)");
+		logger.log(Logger.FINE, "Agent : "+this.getName()+", consomme :"+stock_consumption+"(-"+total+") (-"+quantity+" /sec)");
 	}
 	public void consomme(float delta){
 		consomme(delta, 1);
@@ -206,7 +213,7 @@ public class AgentCommercial extends Agent {
 		if(stock_consumption <= 0){
 			famine += delta;// * 1;
 			reduceSatifaction(delta);
-			logger.log(Logger.INFO, "Agent : "+this.getName()+", Famine increased to "+famine+" !");
+			logger.log(Logger.FINE, "Agent : "+this.getName()+", Famine increased to "+famine+" !");
 		}else{
 			famine = 0;
 		}
@@ -215,6 +222,7 @@ public class AgentCommercial extends Agent {
 	//---------------------Private Methode------------------------------------------------------
 	
 	private void kill(){
+		/*//TODO
 		AgentContainer c = getContainerController();
 		try {
 			AgentController ac = c.getAgent(this.getAID().getLocalName());
@@ -222,6 +230,7 @@ public class AgentCommercial extends Agent {
 		} catch (ControllerException e) {
 			e.printStackTrace();
 		}
+		*/
 	}
 	
 	private void duplication(){
@@ -279,6 +288,20 @@ public class AgentCommercial extends Agent {
 	private void reduceSatifaction(float delta){ 
 		float reduction = (float) (delta * Math.pow(Config.CONST_REDUCE_SATIFACTION, famine)); //TODO
 		satisfaction -= reduction;
+	}
+	
+	//-----------------------Transactions Methodes--------------------------------
+	
+	public synchronized void sell(int quantity, float price) {
+		logger.log(Level.INFO, "Sell "+quantity+" for "+price+" $");
+		stock_production -= quantity;
+		money += price * quantity;
+	}
+
+	public synchronized void buy(int quantity, double price) {
+		logger.log(Level.INFO, "Buy "+quantity+" for "+price+" $");
+		stock_consumption += quantity;
+		money -= price * quantity;
 	}
 	
 	//-----------------------GETTER------------------------------------------------
