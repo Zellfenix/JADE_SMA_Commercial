@@ -45,7 +45,7 @@ public class AgentCommercial extends Agent {
 		super.setup();
 		
 		//Ajoute l'agent commercial au systeme d'analyse de la simulation
-		Analyse.getInstance().agent_setup(this);
+		//Analyse.getInstance().agent_setup(this); //==>a été Deplacer dans le behaviours
 		
 		//Récupération de la classe de gestion des log de jade
 		logger = Logger.getMyLogger(this.getClass().getName());
@@ -60,9 +60,8 @@ public class AgentCommercial extends Agent {
 		//Ajout des classe Behviours
 		addBehaviour(new AgentCommercialBehviours(this, Config.TICKER_DELAY));
 		addBehaviour(new AgentCommercialBehvioursListener());
-		
-		//TODO
-		//addBehaviour(new AgentCommercialBehvioursTransaction(1));
+		addBehaviour(new AgentCommercialBehvioursTransaction());
+
 	}
 
 	@Override
@@ -78,10 +77,10 @@ public class AgentCommercial extends Agent {
 	public void init(){
 		Object[] args = getArguments();
 		if(args.length >= 2){
-			System.out.println((String)args[0]);
-			System.out.println((String)args[1]);
+			System.out.println("Args[0]:"+(String)args[0]);
+			System.out.println("Args[1]:"+(String)args[1]);
 		}
-		if(args != null && args.length > 2){
+		if(args != null && args.length >= 2){
 		    String arg_production = (String)args[0];
 		    String arg_consommation = (String)args[1];
 		    production = Products.valueOf(arg_production);

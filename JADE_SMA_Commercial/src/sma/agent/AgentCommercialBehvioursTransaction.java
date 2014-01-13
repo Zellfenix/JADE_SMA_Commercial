@@ -5,7 +5,6 @@ package sma.agent;
 
 import jade.core.AID;
 import jade.core.behaviours.Behaviour;
-import jade.core.behaviours.OneShotBehaviour;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
@@ -29,22 +28,19 @@ public class AgentCommercialBehvioursTransaction extends Behaviour {
 	private double min_price = Config.INFINI;
 	private AID min_seller;
 	private boolean stop;
-
 	//Regroupe les prix de chaque agent
-	private static HashMap<AID, Double[]> price_table;
+	private HashMap<AID, Double[]> price_table;
 	
-	public AgentCommercialBehvioursTransaction(int quantity) {
+	public AgentCommercialBehvioursTransaction() {
 		super();
 		this.logger = Logger.getMyLogger(this.getClass().getName());
 		
 		price_table = new HashMap<AID, Double[]>();
 		
-		this.quantity = quantity;
-		this.init_quantity = quantity;
+		this.init_quantity = 2;
 		
 		logger.log(Logger.CONFIG, "Create AgentCommercialBehvioursTransaction");
 	}
-
 
 	@Override
 	public void onStart() {
@@ -108,7 +104,7 @@ public class AgentCommercialBehvioursTransaction extends Behaviour {
 			int min_quantity = 0;
 			for(AID seller : price_table.keySet()){
 				Double[] price_tmp = price_table.get(seller);
-				if(price_tmp[0] < min_price || min_seller == null){
+				if((price_tmp[0] < min_price && price_tmp[1].intValue() > 0) || min_seller == null){
 					min_price = price_tmp[0];
 					min_seller = seller;
 					min_quantity = price_tmp[1].intValue();
@@ -116,6 +112,9 @@ public class AgentCommercialBehvioursTransaction extends Behaviour {
 			}
 			
 			if(min_quantity < quantity){
+				if(min_quantity == 0){
+					return;
+				}
 				quantity = min_quantity;
 			}
 			
@@ -166,6 +165,9 @@ public class AgentCommercialBehvioursTransaction extends Behaviour {
 		return stop;
 	}
 	
+	public void setQuantity(int quantity) {	
+		this.init_quantity = quantity;
+	}
 	
 	//-----------Private Methode----------------
 
