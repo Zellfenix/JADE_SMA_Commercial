@@ -36,7 +36,8 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 		
 		price_table = new HashMap<AID, Double[]>();
 		
-		this.init_quantity = 10;
+		//this.init_quantity = 10;
+		this.init_quantity = 1;
 		
 		logger.log(Logger.CONFIG, "Create AgentCommercialBehvioursTransaction");
 	}
@@ -49,7 +50,8 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 		this.myAgentCommercial = (AgentCommercial) this.myAgent;
 		
 		//Behaviour de recherche d'un vendeur
-		myAgent.addBehaviour(new PriceResearch(myAgent, 5000));
+		//myAgent.addBehaviour(new PriceResearch(myAgent, 5000));
+		myAgent.addBehaviour(new PriceResearch(myAgent, 1000));
 	}
 
 	@Override
