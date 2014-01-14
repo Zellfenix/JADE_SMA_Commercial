@@ -70,8 +70,9 @@ public class AgentCommercial extends Agent {
 		
 		//Ajout des classe Behviours
 		addBehaviour(new AgentCommercialBehviours(this, Config.TICKER_DELAY));
-		//addBehaviour(new AgentCommercialBehvioursListener());
-		//addBehaviour(new AgentCommercialBehvioursTransaction(this, 1000));
+		addBehaviour(new AgentCommercialBehvioursListener());
+		
+		addBehaviour(new AgentCommercialBehvioursTransaction(this, 1000));
 
 	}
 

@@ -13,7 +13,8 @@ public enum Product {
 
 	//Liste des produits
 	A(),
-	B();
+	B(),
+	C();
 	
 	private Product() {
 	}

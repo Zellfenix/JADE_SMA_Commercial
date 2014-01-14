@@ -100,7 +100,7 @@ class AgentCommercialBehvioursListenerModule extends Behaviour {
 			//MessageTemplate mt = MessageTemplate.MatchSender(sender);
 			ACLMessage msg = myAgent.receive(mt);
 			if(msg != null) {
-				logger.log(Logger.FINE, "ControlerAgent Receive("+myAgent.getName()+"):"+msg);
+				logger.log(Logger.INFO, "ControlerAgent Receive("+myAgent.getName()+"):"+msg);
 				
 				switch(msg.getPerformative()){
 					case ACLMessage.CFP:

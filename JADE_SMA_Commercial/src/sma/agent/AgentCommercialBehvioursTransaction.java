@@ -52,6 +52,13 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 		//Behaviour de recherche d'un vendeur
 		//myAgent.addBehaviour(new PriceResearch(myAgent, 5000));
 		//myAgent.addBehaviour(new PriceResearch(myAgent, 1000));
+		
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -62,10 +69,11 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 		}
 		
 		//Achete
-		if(price_table.isEmpty() == false){
+		System.out.println("pouet");
 			pricesResearch();
+			System.out.println("pouet price");
 			buyProduct();
-		}
+
 	}
 	
 	@Override
@@ -100,7 +108,8 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 		}
 		
 		//Attente des reponses
-		while(price_table.size() < sellers.length){
+		while(price_table.size() < sellers.length && nb_try < 100){
+			nb_try++;
 			//MessageTemplate mt = MessageTemplate.or( MessageTemplate.MatchPerformative( ACLMessage.PROPOSE ), MessageTemplate.MatchPerformative( ACLMessage.CONFIRM ));
 			MessageTemplate mt = MessageTemplate.MatchPerformative( ACLMessage.PROPOSE );
 			ACLMessage msg = myAgent.receive(mt);

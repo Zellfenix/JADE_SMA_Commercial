@@ -28,13 +28,13 @@ public class AgentCommercialBehviours extends TickerBehaviour {
 	private java.util.logging.Logger logger;
 	private AgentCommercial myAgentCommercial;
 	
-	private static Date last_update; 
+	private Date last_update; 
 	
 	
 	public AgentCommercialBehviours(Agent a, long period) {
 		super(a, period);
 		//Permet de fixer la durée d'un tick a la valeur "period"
-		setFixedPeriod(true);
+		setFixedPeriod(false);
 		
 		myAgentCommercial = (AgentCommercial) myAgent;
 		
