@@ -9,11 +9,13 @@ import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.util.Logger;
+import jade.wrapper.AgentContainer;
+import jade.wrapper.AgentController;
+import jade.wrapper.ControllerException;
 
 import java.util.logging.Level;
 
 import sma.tools.Config;
-import sma.tools.analyse.Analyse;
 
 /**
  * @author Jérémy
@@ -24,12 +26,12 @@ public class AgentCommercial extends Agent {
 	private static final long serialVersionUID = 1L;
 	private Logger logger;
 	
-	private Products production;
+	private Product production;
 	private float stock_production;
 	private float stock_max_production;
 	private float price;
 	
-	private Products consumption;
+	private Product consumption;
 	private float stock_consumption;
 	private float stock_max_consumption;
 	
@@ -60,7 +62,7 @@ public class AgentCommercial extends Agent {
 		//Ajout des classe Behviours
 		addBehaviour(new AgentCommercialBehviours(this, Config.TICKER_DELAY));
 		addBehaviour(new AgentCommercialBehvioursListener());
-		addBehaviour(new AgentCommercialBehvioursTransaction());
+		addBehaviour(new AgentCommercialBehvioursTransaction(this, 1000));
 
 	}
 
@@ -83,22 +85,22 @@ public class AgentCommercial extends Agent {
 		if(args != null && args.length >= 2){
 		    String arg_production = (String)args[0];
 		    String arg_consommation = (String)args[1];
-		    production = Products.valueOf(arg_production);
-		    consumption = Products.valueOf(arg_consommation);
+		    production = Product.valueOf(arg_production);
+		    consumption = Product.valueOf(arg_consommation);
 		}else{
-			production = Products.getRandom();
+			production = Product.getRandom();
 			do{
-				consumption = Products.getRandom();
+				consumption = Product.getRandom();
 			}while(consumption.equals(production));
 		}
 		
 		stock_production = 0;
 		stock_max_production = Config.STOCK_MAX_PRODUCTION;
 		
-		stock_consumption = 0;
+		stock_consumption =  Config.STOCK_MAX_CONSUMPTION * 1/4; //0;
 		stock_max_consumption = Config.STOCK_MAX_CONSUMPTION;
 		
-		satisfaction = 1;
+		satisfaction = 100;
 		money = Config.INIT_MONEY;
 		price = Config.INIT_PRICE;
 	}
@@ -221,7 +223,6 @@ public class AgentCommercial extends Agent {
 	//---------------------Private Methode------------------------------------------------------
 	
 	private void kill(){
-		/*//TODO
 		AgentContainer c = getContainerController();
 		try {
 			AgentController ac = c.getAgent(this.getAID().getLocalName());
@@ -229,7 +230,6 @@ public class AgentCommercial extends Agent {
 		} catch (ControllerException e) {
 			e.printStackTrace();
 		}
-		*/
 	}
 	
 	private void duplication(){
@@ -305,7 +305,7 @@ public class AgentCommercial extends Agent {
 	
 	//-----------------------GETTER------------------------------------------------
 	
-	public Products getConsumption() {
+	public Product getConsumption() {
 		return consumption;
 	}
 	
@@ -317,7 +317,7 @@ public class AgentCommercial extends Agent {
 		return stock_max_consumption;
 	}
 	
-	public Products getProduction() {
+	public Product getProduction() {
 		return production;
 	}
 	

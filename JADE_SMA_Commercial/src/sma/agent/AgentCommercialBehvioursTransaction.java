@@ -4,7 +4,8 @@
 package sma.agent;
 
 import jade.core.AID;
-import jade.core.behaviours.Behaviour;
+import jade.core.Agent;
+import jade.core.behaviours.TickerBehaviour;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
@@ -18,26 +19,24 @@ import sma.tools.Config;
  * @author Jérémy
  * Gere l'achat de ressource
  */
-public class AgentCommercialBehvioursTransaction extends Behaviour {
+public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 
 	private static final long serialVersionUID = 1L;
+	
 	private java.util.logging.Logger logger;
 	private AgentCommercial myAgentCommercial;
-	private int init_quantity;
-	private int quantity;
-	private double min_price = Config.INFINI;
-	private AID min_seller;
-	private boolean stop;
+	
 	//Regroupe les prix de chaque agent
 	private HashMap<AID, Double[]> price_table;
+	private int init_quantity;
 	
-	public AgentCommercialBehvioursTransaction() {
-		super();
+	public AgentCommercialBehvioursTransaction(Agent a, long period) {
+		super(a, period);
 		this.logger = Logger.getMyLogger(this.getClass().getName());
 		
 		price_table = new HashMap<AID, Double[]>();
 		
-		this.init_quantity = 2;
+		this.init_quantity = 10;
 		
 		logger.log(Logger.CONFIG, "Create AgentCommercialBehvioursTransaction");
 	}
@@ -48,27 +47,53 @@ public class AgentCommercialBehvioursTransaction extends Behaviour {
 		//Message test de log
 		logger.log(Logger.INFO, "Entrée dans onStart.");
 		this.myAgentCommercial = (AgentCommercial) this.myAgent;
+		
+		//Behaviour de recherche d'un vendeur
+		myAgent.addBehaviour(new PriceResearch(myAgent, 5000));
 	}
 
 	@Override
-	public void action() {
+	protected void onTick() {
+		//Condition d'achat
 		if(myAgentCommercial.getStock_consumption() == myAgentCommercial.getStock_max_consumption()){
-			try {
-				Thread.sleep(5000);
-			} catch (InterruptedException e) {e.printStackTrace();}
 			return;
 		}
 		
-		quantity = init_quantity;
-		
+		//Achete
+		if(price_table.isEmpty() == false){
+			buyProduct();
+		}
+	}
+	
+	@Override
+	public int onEnd() {
+		//Message test de log
+		logger.log(Logger.INFO, "End of transaction!"); 	
+		return super.onEnd();
+	}
+
+	
+	public void setQuantity(int quantity) {	
+		this.init_quantity = quantity;
+	}
+	
+	//-----------Private Methode----------------
+
+	/**
+	 * Recherche le vendeur de moins chere
+	 */
+	private void pricesResearch(){
+		//Recuperation des resultats depuis le DF
 		DFAgentDescription[] sellers = myAgentCommercial.search();
 		int nb_reponce = 0;
 		int nb_try = 0;
-		//Send CFP
+		
+		//Envois des CFP
 		for(DFAgentDescription seller : sellers){
 			sendCFP(seller.getName());
 		}
 		
+		//Attente des reponses
 		while(nb_reponce < sellers.length && nb_try < 100){
 			nb_try++;
 			//MessageTemplate mt = MessageTemplate.or( MessageTemplate.MatchPerformative( ACLMessage.PROPOSE ), MessageTemplate.MatchPerformative( ACLMessage.CONFIRM ));
@@ -96,34 +121,46 @@ public class AgentCommercialBehvioursTransaction extends Behaviour {
 				}
 			}
 		}
-		
-		//Recherche du vendeur le moins chere
-		if(sellers.length > 0){
-			min_price = Config.INFINI;
-			min_seller = null;
+	}
+	
+	/**
+	 * Achete des produits a consommer
+	 */
+	private void buyProduct(){
+		if(price_table.size() > 0){
+			//Init variables
+			int quantity = init_quantity;
+			double min_price = Config.INFINI;
+			AID min_seller = null;
 			int min_quantity = 0;
+			
+			//Recherche du vendeur le moins chere dans le tableau de prix
 			for(AID seller : price_table.keySet()){
 				Double[] price_tmp = price_table.get(seller);
-				if((price_tmp[0] < min_price && price_tmp[1].intValue() > 0) || min_seller == null){
+				
+				if((price_tmp[0] < min_price && price_tmp[1].intValue() > quantity) || min_seller == null){ //TODO
 					min_price = price_tmp[0];
 					min_seller = seller;
 					min_quantity = price_tmp[1].intValue();
 				}
 			}
 			
+			//Vérification de la quantité disponible
 			if(min_quantity < quantity){
-				if(min_quantity == 0){
-					return;
-				}
 				quantity = min_quantity;
+				return; //TODO
+			}
+			//Vérification de la quantité demandé
+			if(min_quantity == 0){
+				return;
 			}
 			
 			//Envois de l'acceptation
 			sendAccept_Proposal(min_seller, quantity, min_price);
 			
 			//Attente de la confirmation
-			nb_reponce = 0;
-			nb_try = 0;
+			int nb_reponce = 0;
+			int nb_try = 0;
 			while(nb_reponce < 1 && nb_try < 100){
 				nb_try++;
 				MessageTemplate mt = MessageTemplate.or(MessageTemplate.MatchPerformative( ACLMessage.CONFIRM ), MessageTemplate.MatchPerformative( ACLMessage.CANCEL ));
@@ -144,33 +181,8 @@ public class AgentCommercialBehvioursTransaction extends Behaviour {
 				}
 			}
 		}
-		
-		//System.out.println("\n"+price_table+"\n");
-		try {
-			Thread.sleep(500);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-	}
-
-	@Override
-	public int onEnd() {
-		//Message test de log
-		logger.log(Logger.INFO, "End of transaction!"); 	
-		return super.onEnd();
-	}
-
-	@Override
-	public boolean done() {
-		return stop;
 	}
 	
-	public void setQuantity(int quantity) {	
-		this.init_quantity = quantity;
-	}
-	
-	//-----------Private Methode----------------
-
 	private void sendCFP(AID aid){
 		ACLMessage msg = new ACLMessage(ACLMessage.CFP);
 		msg.addReceiver(aid);
@@ -191,4 +203,18 @@ public class AgentCommercialBehvioursTransaction extends Behaviour {
 		myAgentCommercial.buy(quantity, price);
 	}
 
+	
+	//--------------------Private Behaviours----------------------
+	
+	private class PriceResearch extends TickerBehaviour{
+		private static final long serialVersionUID = 1L;
+		public PriceResearch(Agent a, long period) {
+			super(a, period);
+		}
+		@Override
+		protected void onTick() {
+			pricesResearch();
+		}
+	}
+	
 }

@@ -69,8 +69,8 @@ public class AgentCommercialBehviours extends TickerBehaviour {
 		logger.log(Logger.FINE, "Entrée dans onTick. delta="+delta); 
 		
 		myAgentCommercial.produce(delta);
-		//myAgentCommercial.consomme(delta);
-		//myAgentCommercial.check_satisfaction(delta);
+		myAgentCommercial.consomme(delta);
+		myAgentCommercial.check_satisfaction(delta);
 		
 		last_update = new Date();
 		

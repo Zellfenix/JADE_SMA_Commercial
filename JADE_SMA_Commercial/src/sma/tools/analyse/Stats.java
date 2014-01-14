@@ -1,18 +1,18 @@
 package sma.tools.analyse;
 
 import sma.agent.AgentCommercial;
-import sma.agent.Products;
+import sma.agent.Product;
 
 public class Stats {
 
 	private String name;
 	
-	private Products production;
+	private Product production;
 	private float stock_production;
 	private float stock_max_production;
 	private float price;
 	
-	private Products consumption;
+	private Product consumption;
 	private float stock_consumption;
 	private float stock_max_consumption;
 	
@@ -43,7 +43,7 @@ public class Stats {
 		return name;
 	}
 
-	public Products getProduction() {
+	public Product getProduction() {
 		return production;
 	}
 
@@ -59,7 +59,7 @@ public class Stats {
 		return price;
 	}
 
-	public Products getConsumption() {
+	public Product getConsumption() {
 		return consumption;
 	}
 

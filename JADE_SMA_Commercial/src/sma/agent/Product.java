@@ -9,19 +9,19 @@ import java.util.Random;
  * @author Jérémy
  *
  */
-public enum Products {
+public enum Product {
 
 	//Liste des produits
 	A(),
 	B();
 	
-	private Products() {
+	private Product() {
 	}
 	
-	public static Products getRandom(){
+	public static Product getRandom(){
 		Random r = new Random();
-		int index = r.nextInt(Products.values().length);
-		return Products.values()[index];
+		int index = r.nextInt(Product.values().length);
+		return Product.values()[index];
 	}
 	
 }
