@@ -84,9 +84,10 @@ public class AgentCommercialBehviours extends TickerBehaviour {
 	public int onEnd() {
 		//Message test de log
 		logger.log(Logger.INFO, "Entrée dans onEnd."); 	
+		sendInfoToAnalyser("END");
 		return super.onEnd();
 	}
-
+	
 	/**
 	 * Envois les données de l'agent commercial a l'agent d'analyse
 	 * @param action
@@ -108,8 +109,10 @@ public class AgentCommercialBehviours extends TickerBehaviour {
 				ACLMessage msg;
 				if(action.equals("SETUP")){
 					msg = new ACLMessage(ACLMessage.INFORM);
-				}else{
+				}else if(action.equals("UPDATE")){
 					msg = new ACLMessage(ACLMessage.PROPAGATE);
+				}else{
+					msg = new ACLMessage(ACLMessage.FAILURE);
 				}
 				try {
 					msg.setContentObject(myAgentCommercial);

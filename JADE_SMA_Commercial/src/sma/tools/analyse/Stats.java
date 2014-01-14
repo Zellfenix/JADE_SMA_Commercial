@@ -49,6 +49,10 @@ public class Stats {
 		average_satifaction = agent.getAverage_satifaction();
 	}
 	
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	
 	public String getName() {
 		return name;
 	}

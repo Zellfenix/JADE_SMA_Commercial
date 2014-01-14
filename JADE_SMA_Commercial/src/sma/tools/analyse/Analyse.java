@@ -87,6 +87,14 @@ public class Analyse extends JFrame {
 		agent_stats.get(agentCommercial.getName()).update(agentCommercial);
 		tableModel.fireTableDataChanged();
 		agents.get(agentCommercial.getName()).update(agentCommercial);
+		agent_stats.get(agentCommercial.getName()).setStatus("Alive");
+	}
+	
+	public void agent_dead(AgentCommercial agentCommercial){
+		agent_stats.get(agentCommercial.getName()).update(agentCommercial);
+		tableModel.fireTableDataChanged();
+		agents.get(agentCommercial.getName()).update(agentCommercial);
+		agent_stats.get(agentCommercial.getName()).setStatus("Dead");
 	}
 	
 }

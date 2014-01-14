@@ -37,9 +37,12 @@ public class AgentAnalyser extends Agent{
 					if(msg.getPerformative() == ACLMessage.INFORM){
 						agentCommercial = (AgentCommercial) msg.getContentObject();
 						Analyse.getInstance().agent_setup(agentCommercial);
-					}else{
+					}else if(msg.getPerformative() == ACLMessage.PROPAGATE){
 						agentCommercial = (AgentCommercial) msg.getContentObject();
 						Analyse.getInstance().agent_update(agentCommercial);
+					}else{
+						agentCommercial = (AgentCommercial) msg.getContentObject();
+						Analyse.getInstance().agent_dead(agentCommercial);
 					}
 				} catch (UnreadableException e) {
 					e.printStackTrace();
