@@ -3,17 +3,20 @@
  */
 package sma.agent;
 
+import jade.core.AID;
 import jade.core.Agent;
 import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
+import jade.lang.acl.ACLMessage;
 import jade.util.Logger;
 import jade.wrapper.AgentContainer;
 import jade.wrapper.AgentController;
 import jade.wrapper.ControllerException;
 import jade.wrapper.StaleProxyException;
 
+import java.io.IOException;
 import java.util.logging.Level;
 
 import sma.tools.Config;
@@ -39,11 +42,12 @@ public class AgentCommercial extends Agent {
 	private float money;
 	private float satisfaction;
 	
-	private static int iteration = 0;
+	private int iteration = 0;
 	private double average_price;
 	private double average_satifaction;
 	private double average_money;
-
+	private double life_time;
+	
 	private int lineage = 0;
 	
 	/**
@@ -76,12 +80,14 @@ public class AgentCommercial extends Agent {
 		addBehaviour(new AgentCommercialBehvioursListener());	
 		addBehaviour(new AgentCommercialBehvioursTransaction(this, 1000));
 
+		sendInfoToAnalyser("SETUP");	
 	}
 
 	@Override
 	protected void takeDown() {
 		super.takeDown();
 		deregister();
+		sendInfoToAnalyser("END");
 		logger.log(Logger.INFO, "Destroy agent :"+this); 
 	}
 	
@@ -235,7 +241,7 @@ public class AgentCommercial extends Agent {
 			kill();
 		}
 		
-		if(satisfaction == 100 && money > Config.INIT_MONEY*1.5){//TODO condition de Duplication ?
+		if(satisfaction == 100 && money > Config.INIT_MONEY*1.5){
 			duplication();
 		}
 		
@@ -261,7 +267,49 @@ public class AgentCommercial extends Agent {
 		average_price = compute_average(average_price, price);
 		average_satifaction = compute_average(average_satifaction, satisfaction);
 		average_money = compute_average(average_money, money);
+		life_time += delta;
 	}
+	
+
+	/**
+	 * Envois les données de l'agent commercial a l'agent d'analyse
+	 * @param action
+	 */
+	public void sendInfoToAnalyser(String action){
+		//Analyse.getInstance().agent_update(myAgentCommercial); 
+		DFAgentDescription template = new DFAgentDescription();
+		ServiceDescription sd = new ServiceDescription();
+		sd.setType("SYSLOG");
+		template.addServices(sd);
+		
+		DFAgentDescription[] result;
+		try {
+			result = DFService.search(this, template);
+			AID[] agents = new AID[result.length];
+			for (int i = 0; i < result.length; ++i) {
+				agents[i] = result[i].getName();
+				//Send
+				ACLMessage msg;
+				if(action.equals("SETUP")){
+					msg = new ACLMessage(ACLMessage.INFORM);
+				}else if(action.equals("UPDATE")){
+					msg = new ACLMessage(ACLMessage.PROPAGATE);
+				}else{
+					msg = new ACLMessage(ACLMessage.FAILURE);
+				}
+				try {
+					msg.setContentObject(this);
+					msg.addReceiver(result[i].getName());
+					send(msg);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		} catch (FIPAException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	
 	//---------------------Private Methode------------------------------------------------------
 	
@@ -418,6 +466,10 @@ public class AgentCommercial extends Agent {
 	
 	public double getAverage_satifaction() {
 		return average_satifaction;
+	}
+	
+	public double getLife_time() {
+		return life_time;
 	}
 	
 	//----------------------ToString-----------------------------------------------

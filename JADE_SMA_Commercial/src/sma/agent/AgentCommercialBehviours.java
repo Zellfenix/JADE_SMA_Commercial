@@ -47,8 +47,6 @@ public class AgentCommercialBehviours extends TickerBehaviour {
 		//Message test de log
 		logger.log(Logger.INFO, "Entrée dans onStart.");
 		
-		sendInfoToAnalyser("SETUP");
-		
 		last_update = new Date();
 	}
 	
@@ -77,54 +75,14 @@ public class AgentCommercialBehviours extends TickerBehaviour {
 		last_update = new Date();
 		
 		//Met a jour les informations de la simulation
-		sendInfoToAnalyser("UPDATE");
+		myAgentCommercial.sendInfoToAnalyser("UPDATE");
 	}
 	
 	@Override
 	public int onEnd() {
 		//Message test de log
 		logger.log(Logger.INFO, "Entrée dans onEnd."); 	
-		sendInfoToAnalyser("END");
 		return super.onEnd();
-	}
-	
-	/**
-	 * Envois les données de l'agent commercial a l'agent d'analyse
-	 * @param action
-	 */
-	private void sendInfoToAnalyser(String action){
-		//Analyse.getInstance().agent_update(myAgentCommercial); 
-		DFAgentDescription template = new DFAgentDescription();
-		ServiceDescription sd = new ServiceDescription();
-		sd.setType("SYSLOG");
-		template.addServices(sd);
-		
-		DFAgentDescription[] result;
-		try {
-			result = DFService.search(myAgent, template);
-			AID[] agents = new AID[result.length];
-			for (int i = 0; i < result.length; ++i) {
-				agents[i] = result[i].getName();
-				//Send
-				ACLMessage msg;
-				if(action.equals("SETUP")){
-					msg = new ACLMessage(ACLMessage.INFORM);
-				}else if(action.equals("UPDATE")){
-					msg = new ACLMessage(ACLMessage.PROPAGATE);
-				}else{
-					msg = new ACLMessage(ACLMessage.FAILURE);
-				}
-				try {
-					msg.setContentObject(myAgentCommercial);
-					msg.addReceiver(result[i].getName());
-					myAgent.send(msg);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		} catch (FIPAException e) {
-			e.printStackTrace();
-		}
 	}
 	
 }

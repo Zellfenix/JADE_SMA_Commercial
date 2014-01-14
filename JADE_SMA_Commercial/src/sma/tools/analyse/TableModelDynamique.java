@@ -10,7 +10,7 @@ public class TableModelDynamique extends AbstractTableModel {
 
 	private List<Stats> stats = new ArrayList<Stats>();
  
-    private final String[] entetes = {"Name", "Status", "Satisfaction", "Satisfaction Average", "Production", "Production Stock", "Price", "Price Average", "Consuption", "Consuption Stock", "Money", "Money Average"};
+    private final String[] entetes = {"Name", "Status", "Satisfaction", "Satisfaction Average", "Production", "Production Stock", "Price", "Price Average", "Consuption", "Consuption Stock", "Money", "Money Average", "Life Time"};
  
     public TableModelDynamique() {
         super();
@@ -35,25 +35,27 @@ public class TableModelDynamique extends AbstractTableModel {
             case 1:
                 return stats.get(rowIndex).getStatus();
             case 2:
-                return stats.get(rowIndex).getSatisfaction();
+                return String.format("%.2f", stats.get(rowIndex).getSatisfaction());
             case 3:
-                return stats.get(rowIndex).getAverage_satifaction();
+                return String.format("%.2f", stats.get(rowIndex).getAverage_satifaction());
             case 4:
                 return stats.get(rowIndex).getProduction();
             case 5:
-                return stats.get(rowIndex).getStock_production();
+                return String.format("%.2f", stats.get(rowIndex).getStock_production());
             case 6:
-                return stats.get(rowIndex).getPrice();
+                return String.format("%.2f", stats.get(rowIndex).getPrice());
             case 7:
-                return stats.get(rowIndex).getAverage_price();
+                return String.format("%.2f", stats.get(rowIndex).getAverage_price());
             case 8:
                 return stats.get(rowIndex).getConsumption();
             case 9:
-                return stats.get(rowIndex).getStock_consumption();
+                return String.format("%.2f", stats.get(rowIndex).getStock_consumption());
             case 10:
-                return stats.get(rowIndex).getMoney();
+                return String.format("%.2f", stats.get(rowIndex).getMoney());
             case 11:
-                return stats.get(rowIndex).getAverage_money();
+                return String.format("%.2f", stats.get(rowIndex).getAverage_money());
+            case 12:
+                return String.format("%.0f", stats.get(rowIndex).getLife_time());
             default:
                 return null; //Ne devrait jamais arriver
         }
