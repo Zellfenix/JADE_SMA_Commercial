@@ -37,6 +37,12 @@ public class AgentCommercial extends Agent {
 	
 	private float money;
 	private float satisfaction;
+	
+	private static int iteration = 0;
+	private double average_price;
+	private double average_satifaction;
+	private double average_money;
+	
 	/**
 	 * Temps passé sans pouvoir consommé de produit
 	 */
@@ -103,6 +109,10 @@ public class AgentCommercial extends Agent {
 		satisfaction = 100;
 		money = Config.INIT_MONEY;
 		price = Config.INIT_PRICE;
+		
+		average_money = money;
+		average_price = price;
+		average_satifaction = satisfaction;
 	}
 	
 	/**
@@ -220,7 +230,18 @@ public class AgentCommercial extends Agent {
 		}
 	}
 	
+	public void compute_stats(float delta) {
+		iteration++;
+		average_price = compute_average(average_price, price);
+		average_satifaction = compute_average(average_satifaction, satisfaction);
+		average_money = compute_average(average_money, money);
+	}
+	
 	//---------------------Private Methode------------------------------------------------------
+	
+	private double compute_average(double a, double b){
+		return a + (b-a)/iteration;
+	}
 	
 	private void kill(){
 		AgentContainer c = getContainerController();
@@ -343,6 +364,18 @@ public class AgentCommercial extends Agent {
 	
 	public float getMoney() {
 		return money;
+	}
+	
+	public double getAverage_money() {
+		return average_money;
+	}
+	
+	public double getAverage_price() {
+		return average_price;
+	}
+	
+	public double getAverage_satifaction() {
+		return average_satifaction;
 	}
 	
 	//----------------------ToString-----------------------------------------------

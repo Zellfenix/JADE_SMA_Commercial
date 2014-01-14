@@ -7,6 +7,8 @@ public class Stats {
 
 	private String name;
 	
+	private String status;
+	
 	private Product production;
 	private float stock_production;
 	private float stock_max_production;
@@ -18,6 +20,10 @@ public class Stats {
 	
 	private float money;
 	private float satisfaction;
+	
+	private double average_price;
+	private double average_satifaction;
+	private double average_money;
 	
 	public Stats(AgentCommercial agent) {
 		update(agent);
@@ -37,6 +43,10 @@ public class Stats {
 		
 		money = agent.getMoney();
 		satisfaction = agent.getSatisfaction();
+		
+		average_price = agent.getAverage_price();
+		average_money = agent.getAverage_money();
+		average_satifaction = agent.getAverage_satifaction();
 	}
 	
 	public String getName() {
@@ -77,6 +87,22 @@ public class Stats {
 
 	public float getSatisfaction() {
 		return satisfaction;
+	}
+	
+	public String getStatus() {
+		return status;
+	}
+	
+	public double getAverage_money() {
+		return average_money;
+	}
+	
+	public double getAverage_price() {
+		return average_price;
+	}
+	
+	public double getAverage_satifaction() {
+		return average_satifaction;
 	}
 	
 }
