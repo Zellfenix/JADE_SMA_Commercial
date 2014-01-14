@@ -211,7 +211,17 @@ public class AgentCommercial extends Agent {
 	public void consomme(double delta){
 		consomme(delta, 1);
 	}
-	
+	/**
+	 * Mise à jour des prix
+	 */
+	public void update_price(){
+		if(satisfaction >= Config.PRICE_MAX_SATISFACTION && money >= Config.PRICE_MAX_MONEY){
+			price += 1;
+		}
+		else if(satisfaction >= Config.PRICE_MIN_SATISFACTION && money >= Config.PRICE_MIN_MONEY){
+			price = Math.max(price - 1, 1);
+		}
+	}
 	
 	/**
 	 * Vérifie la satifaction et effectue les opérations nécéssaires
