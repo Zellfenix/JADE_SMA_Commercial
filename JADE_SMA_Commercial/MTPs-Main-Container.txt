@@ -1,1 +1,1 @@
-http://10.40.57.169:7778/acc
+http://Antoine-PC.connectify:7778/acc

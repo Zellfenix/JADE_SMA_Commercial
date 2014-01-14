@@ -16,6 +16,8 @@ import jade.util.Logger;
 import java.io.IOException;
 import java.util.Date;
 
+import sma.tools.analyse.Analyse;
+
 /**
  * @author Jérémy
  *
@@ -26,13 +28,13 @@ public class AgentCommercialBehviours extends TickerBehaviour {
 	private java.util.logging.Logger logger;
 	private AgentCommercial myAgentCommercial;
 	
-	private static Date last_update; 
+	private Date last_update; 
 	
 	
 	public AgentCommercialBehviours(Agent a, long period) {
 		super(a, period);
 		//Permet de fixer la durée d'un tick a la valeur "period"
-		setFixedPeriod(true);
+		setFixedPeriod(false);
 		
 		myAgentCommercial = (AgentCommercial) myAgent;
 		
@@ -61,14 +63,16 @@ public class AgentCommercialBehviours extends TickerBehaviour {
 	 */
 	@Override
 	protected void onTick() {
-		float delta = (float) (((new Date()).getTime() - last_update.getTime()) / 1000.0);
+		double delta = (((new Date()).getTime() - last_update.getTime()) / 1000.0);
 		
 		//Message test de log
-		logger.log(Logger.FINE, "Entrée dans onTick. delta="+delta); 
+		logger.log(Logger.INFO, myAgent.getName()+" : Entrée dans onTick. delta="+delta); 
 		
 		myAgentCommercial.produce(delta);
 		myAgentCommercial.consomme(delta);
 		myAgentCommercial.check_satisfaction(delta);
+		myAgentCommercial.update_price();
+		myAgentCommercial.compute_stats(delta);
 		
 		last_update = new Date();
 		
@@ -80,9 +84,10 @@ public class AgentCommercialBehviours extends TickerBehaviour {
 	public int onEnd() {
 		//Message test de log
 		logger.log(Logger.INFO, "Entrée dans onEnd."); 	
+		sendInfoToAnalyser("END");
 		return super.onEnd();
 	}
-
+	
 	/**
 	 * Envois les données de l'agent commercial a l'agent d'analyse
 	 * @param action
@@ -104,8 +109,10 @@ public class AgentCommercialBehviours extends TickerBehaviour {
 				ACLMessage msg;
 				if(action.equals("SETUP")){
 					msg = new ACLMessage(ACLMessage.INFORM);
-				}else{
+				}else if(action.equals("UPDATE")){
 					msg = new ACLMessage(ACLMessage.PROPAGATE);
+				}else{
+					msg = new ACLMessage(ACLMessage.FAILURE);
 				}
 				try {
 					msg.setContentObject(myAgentCommercial);

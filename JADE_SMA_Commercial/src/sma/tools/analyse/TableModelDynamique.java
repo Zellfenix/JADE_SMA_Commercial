@@ -10,7 +10,7 @@ public class TableModelDynamique extends AbstractTableModel {
 
 	private List<Stats> stats = new ArrayList<Stats>();
  
-    private final String[] entetes = {"Name", "Satisfaction", "Production", "Production Stock", "Consuption", "Consuption Stock", "Money"};
+    private final String[] entetes = {"Name", "Status", "Satisfaction", "Satisfaction Average", "Production", "Production Stock", "Price", "Price Average", "Consuption", "Consuption Stock", "Money", "Money Average"};
  
     public TableModelDynamique() {
         super();
@@ -33,17 +33,27 @@ public class TableModelDynamique extends AbstractTableModel {
             case 0:
                 return stats.get(rowIndex).getName();
             case 1:
-                return stats.get(rowIndex).getSatisfaction();
+                return stats.get(rowIndex).getStatus();
             case 2:
-                return stats.get(rowIndex).getProduction();
+                return stats.get(rowIndex).getSatisfaction();
             case 3:
-                return stats.get(rowIndex).getStock_production();
+                return stats.get(rowIndex).getAverage_satifaction();
             case 4:
-                return stats.get(rowIndex).getConsumption();
+                return stats.get(rowIndex).getProduction();
             case 5:
-                return stats.get(rowIndex).getStock_consumption();
+                return stats.get(rowIndex).getStock_production();
             case 6:
+                return stats.get(rowIndex).getPrice();
+            case 7:
+                return stats.get(rowIndex).getAverage_price();
+            case 8:
+                return stats.get(rowIndex).getConsumption();
+            case 9:
+                return stats.get(rowIndex).getStock_consumption();
+            case 10:
                 return stats.get(rowIndex).getMoney();
+            case 11:
+                return stats.get(rowIndex).getAverage_money();
             default:
                 return null; //Ne devrait jamais arriver
         }

@@ -36,7 +36,8 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 		
 		price_table = new HashMap<AID, Double[]>();
 		
-		this.init_quantity = 10;
+		//this.init_quantity = 10;
+		this.init_quantity = 1;
 		
 		logger.log(Logger.CONFIG, "Create AgentCommercialBehvioursTransaction");
 	}
@@ -49,20 +50,30 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 		this.myAgentCommercial = (AgentCommercial) this.myAgent;
 		
 		//Behaviour de recherche d'un vendeur
-		myAgent.addBehaviour(new PriceResearch(myAgent, 5000));
+		//myAgent.addBehaviour(new PriceResearch(myAgent, 5000));
+		//myAgent.addBehaviour(new PriceResearch(myAgent, 1000));
+		
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	@Override
 	protected void onTick() {
 		//Condition d'achat
-		if(myAgentCommercial.getStock_consumption() == myAgentCommercial.getStock_max_consumption()) {
+		if(myAgentCommercial.getStock_consumption() == myAgentCommercial.getStock_max_consumption()){
 			return;
 		}
 		
 		//Achete
-		if(!price_table.isEmpty()) {
+		System.out.println("pouet");
+			pricesResearch();
+			System.out.println("pouet price");
 			buyProduct();
-		}
+
 	}
 	
 	@Override
@@ -78,23 +89,26 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 	}
 	
 	//-----------Private Methode----------------
-
+	private int moreSuitableQuantity(double price,int quantity){
+		return (int) Math.min(myAgentCommercial.getStock_max_consumption()-myAgentCommercial.getStock_consumption(), Math.min(myAgentCommercial.getMoney()/price,quantity));
+	}
 	/**
-	 * Recherche le vendeur de moins chere
+	 * Recherche le vendeur le moins chere
 	 */
 	private void pricesResearch(){
 		//Recuperation des resultats depuis le DF
 		DFAgentDescription[] sellers = myAgentCommercial.search();
 		int nb_reponce = 0;
 		int nb_try = 0;
+		price_table.clear();
 		
 		//Envois des CFP
-		for(DFAgentDescription seller : sellers) {
+		for(DFAgentDescription seller : sellers){
 			sendCFP(seller.getName());
 		}
 		
 		//Attente des reponses
-		while(nb_reponce < sellers.length && nb_try < 100){
+		while(price_table.size() < sellers.length && nb_try < 100){
 			nb_try++;
 			//MessageTemplate mt = MessageTemplate.or( MessageTemplate.MatchPerformative( ACLMessage.PROPOSE ), MessageTemplate.MatchPerformative( ACLMessage.CONFIRM ));
 			MessageTemplate mt = MessageTemplate.MatchPerformative( ACLMessage.PROPOSE );
@@ -110,7 +124,8 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 							double price = Double.parseDouble(propose[2]);
 							Double[] tmp = {price, (double) quantity};
 							price_table.put(msg.getSender(), tmp);
-							nb_reponce++;
+							//nb_reponce++;
+							System.out.println("Taille price_table : "+price_table.size());
 						} catch (NumberFormatException e) {
 							e.printStackTrace();
 							return;
@@ -129,7 +144,7 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 	private void buyProduct(){
 		if(price_table.size() > 0){
 			//Init variables
-			int quantity = init_quantity;
+			//int quantity = init_quantity;
 			double min_price = Config.INFINI;
 			AID min_seller = null;
 			int min_quantity = 0;
@@ -138,13 +153,13 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 			for(AID seller : price_table.keySet()){
 				Double[] price_tmp = price_table.get(seller);
 				
-				if((price_tmp[0] < min_price && price_tmp[1].intValue() > quantity) || min_seller == null){ //TODO
+				if((price_tmp[0] < min_price && price_tmp[1].intValue() > 0) || min_seller == null){ //TODO
 					min_price = price_tmp[0];
 					min_seller = seller;
-					min_quantity = price_tmp[1].intValue();
+					min_quantity = moreSuitableQuantity(price_tmp[0],price_tmp[1].intValue());
 				}
 			}
-			
+		/*	
 			//Vérification de la quantité disponible
 			if(min_quantity < quantity){
 				quantity = min_quantity;
@@ -154,9 +169,20 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 			if(min_quantity == 0){
 				return;
 			}
+		*/	
 			
 			//Envois de l'acceptation
-			sendAccept_Proposal(min_seller, quantity, min_price);
+			for(AID seller : price_table.keySet()){
+				if(seller.equals(min_seller) == false){
+					sendReject_Proposal(seller);
+				}else{
+					if(min_quantity == 0){
+						sendReject_Proposal(seller);
+					}else{
+						sendAccept_Proposal(min_seller, min_quantity, min_price);
+					}
+				}
+			}
 			
 			//Attente de la confirmation
 			int nb_reponce = 0;
@@ -171,7 +197,7 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 					switch(msg.getPerformative()){	
 						case ACLMessage.CONFIRM:
 							if(min_seller != null && min_price != Config.INFINI)
-								executeTransaction(quantity, min_price);
+								executeTransaction(min_quantity, min_price);
 							break;
 						case ACLMessage.CANCEL:
 							break;
@@ -183,20 +209,24 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 		}
 	}
 	
-	private void sendCFP(AID aid) {
+	private void sendCFP(AID aid){
 		ACLMessage msg = new ACLMessage(ACLMessage.CFP);
 		msg.addReceiver(aid);
 		myAgent.send(msg);
 	}
 	
-	private void sendAccept_Proposal(AID aid, int quantity, double price) {
-		//Check money
-		if(myAgentCommercial.getMoney() >= quantity * price){
-			ACLMessage msg = new ACLMessage(ACLMessage.ACCEPT_PROPOSAL);
-			msg.setContent("ACCEPT_PROPOSAL "+quantity);
-			msg.addReceiver(aid);
-			myAgent.send(msg);
-		}
+	private void sendAccept_Proposal(AID aid, int quantity, double price){
+		ACLMessage msg = new ACLMessage(ACLMessage.ACCEPT_PROPOSAL);
+		msg.setContent("ACCEPT_PROPOSAL "+quantity);
+		msg.addReceiver(aid);
+		myAgent.send(msg);
+	}
+	
+	private void sendReject_Proposal(AID aid){
+		ACLMessage msg = new ACLMessage(ACLMessage.REJECT_PROPOSAL);
+		msg.setContent("REJECT_PROPOSAL");
+		msg.addReceiver(aid);
+		myAgent.send(msg);
 	}
 	
 	private void executeTransaction(int quantity, double price) {

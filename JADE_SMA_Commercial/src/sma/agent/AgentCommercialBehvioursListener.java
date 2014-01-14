@@ -38,7 +38,7 @@ public class AgentCommercialBehvioursListener extends Behaviour {
 		ACLMessage msg = myAgent.receive(mt);
 		if(msg != null) {
 			if(listener.containsKey(msg.getSender().toString()) == false){
-				logger.log(Logger.INFO, "Create ListenerModule for :"+msg.getSender());
+				logger.log(Logger.INFO, "Create ListerModule for :"+msg.getSender());
 				
 				AgentCommercialBehvioursListenerModule listener_agent = new AgentCommercialBehvioursListenerModule(msg.getSender());
 				myAgent.addBehaviour(listener_agent);
@@ -66,10 +66,10 @@ class AgentCommercialBehvioursListenerModule extends Behaviour {
 	private java.util.logging.Logger logger;
 	private AgentCommercial myAgentCommercial;
 	private AID sender;
-	//
-	private float priceSend;
-	private int quantitySend;
 	private boolean stop = false;
+	//
+	private double priceSend;
+	private int quantitySend;
 
 	public AgentCommercialBehvioursListenerModule(AID sender) {
 		super();
@@ -91,19 +91,26 @@ class AgentCommercialBehvioursListenerModule extends Behaviour {
 	public void action() {
 		if(myAgentCommercial != null){
 			MessageTemplate mt = MessageTemplate.and( 
-					MessageTemplate.or( MessageTemplate.MatchPerformative( ACLMessage.CFP ), MessageTemplate.MatchPerformative( ACLMessage.ACCEPT_PROPOSAL )), 
+					MessageTemplate.or( 
+							MessageTemplate.MatchPerformative( ACLMessage.CFP ), 
+							MessageTemplate.or(
+									MessageTemplate.MatchPerformative( ACLMessage.ACCEPT_PROPOSAL ),
+									MessageTemplate.MatchPerformative( ACLMessage.REJECT_PROPOSAL ))), 
 					MessageTemplate.MatchSender(sender) );
 			//MessageTemplate mt = MessageTemplate.MatchSender(sender);
 			ACLMessage msg = myAgent.receive(mt);
 			if(msg != null) {
-				logger.log(Logger.FINE, "ControlerAgent Receive("+myAgent.getName()+"):"+msg);
+				logger.log(Logger.INFO, "ControlerAgent Receive("+myAgent.getName()+"):"+msg);
 				
-				switch(msg.getPerformative()) {
+				switch(msg.getPerformative()){
 					case ACLMessage.CFP:
 						sendPropose(msg);
 						break;
 					case ACLMessage.ACCEPT_PROPOSAL:
 						sendConfirm(msg);
+						break;
+					case ACLMessage.REJECT_PROPOSAL:
+						//sendConfirm(msg);
 						break;
 					default:
 						break;

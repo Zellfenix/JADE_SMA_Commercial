@@ -98,6 +98,7 @@ public class Analyse extends JFrame {
 		agent_stats.get(agentCommercial.getName()).update(agentCommercial);
 		tableModel.fireTableDataChanged();
 		agents.get(agentCommercial.getName()).update(agentCommercial);
+		agent_stats.get(agentCommercial.getName()).setStatus("Alive");
 
 		for (Entry<String, Stats> e : Analyse.getInstance().agent_stats.entrySet()) {
 			if (!agent_chart.containsKey(e.getKey())) {
@@ -117,5 +118,12 @@ public class Analyse extends JFrame {
 		panel_charts.updateUI();
 		panel_charts.repaint();
 	}
-	
+
+	public void agent_dead(AgentCommercial agentCommercial){
+		agent_stats.get(agentCommercial.getName()).update(agentCommercial);
+		tableModel.fireTableDataChanged();
+		agents.get(agentCommercial.getName()).update(agentCommercial);
+		agent_stats.get(agentCommercial.getName()).setStatus("Dead");
+	}
+
 }
