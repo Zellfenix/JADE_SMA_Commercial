@@ -55,12 +55,12 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 	@Override
 	protected void onTick() {
 		//Condition d'achat
-		if(myAgentCommercial.getStock_consumption() == myAgentCommercial.getStock_max_consumption()){
+		if(myAgentCommercial.getStock_consumption() == myAgentCommercial.getStock_max_consumption()) {
 			return;
 		}
 		
 		//Achete
-		if(price_table.isEmpty() == false){
+		if(!price_table.isEmpty()) {
 			buyProduct();
 		}
 	}
@@ -89,7 +89,7 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 		int nb_try = 0;
 		
 		//Envois des CFP
-		for(DFAgentDescription seller : sellers){
+		for(DFAgentDescription seller : sellers) {
 			sendCFP(seller.getName());
 		}
 		
@@ -183,13 +183,13 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 		}
 	}
 	
-	private void sendCFP(AID aid){
+	private void sendCFP(AID aid) {
 		ACLMessage msg = new ACLMessage(ACLMessage.CFP);
 		msg.addReceiver(aid);
 		myAgent.send(msg);
 	}
 	
-	private void sendAccept_Proposal(AID aid, int quantity, double price){
+	private void sendAccept_Proposal(AID aid, int quantity, double price) {
 		//Check money
 		if(myAgentCommercial.getMoney() >= quantity * price){
 			ACLMessage msg = new ACLMessage(ACLMessage.ACCEPT_PROPOSAL);

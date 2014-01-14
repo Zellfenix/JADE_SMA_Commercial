@@ -16,8 +16,6 @@ import jade.util.Logger;
 import java.io.IOException;
 import java.util.Date;
 
-import sma.tools.analyse.Analyse;
-
 /**
  * @author Jérémy
  *

@@ -38,7 +38,7 @@ public class AgentCommercialBehvioursListener extends Behaviour {
 		ACLMessage msg = myAgent.receive(mt);
 		if(msg != null) {
 			if(listener.containsKey(msg.getSender().toString()) == false){
-				logger.log(Logger.INFO, "Create ListerModule for :"+msg.getSender());
+				logger.log(Logger.INFO, "Create ListenerModule for :"+msg.getSender());
 				
 				AgentCommercialBehvioursListenerModule listener_agent = new AgentCommercialBehvioursListenerModule(msg.getSender());
 				myAgent.addBehaviour(listener_agent);
@@ -98,7 +98,7 @@ class AgentCommercialBehvioursListenerModule extends Behaviour {
 			if(msg != null) {
 				logger.log(Logger.FINE, "ControlerAgent Receive("+myAgent.getName()+"):"+msg);
 				
-				switch(msg.getPerformative()){
+				switch(msg.getPerformative()) {
 					case ACLMessage.CFP:
 						sendPropose(msg);
 						break;

@@ -240,51 +240,39 @@ public class AgentCommercial extends Agent {
 	 * Ajoute des produits au stock de produit creé
 	 * @param quantity Quantité de produit ajouté
 	 */
-	private void addStock_Product(float quantity){
-		stock_production += quantity;
-		if(stock_production > stock_max_production){
-			stock_production = stock_max_production;
-		}
+	private void addStock_Product(float quantity) {
+		stock_production = Math.min(stock_production + quantity, stock_max_production);
 	}
 	
 	/**
 	 * Retire des produits au stock de produit creé
 	 * @param quantity Quantité de produit retiré
 	 */
-	private void removeStock_Product(float quantity){
-		stock_production -= quantity;
-		if(stock_production < 0){
-			stock_production = 0;
-		}
+	private void removeStock_Product(float quantity) {
+		stock_production = Math.max(stock_production - quantity, 0);
 	}
 	
 	/**
 	 * Ajoute des produits au stock de produit consommé
 	 * @param quantity Quantité de produit ajouté
 	 */
-	private void addStock_Consomme(float quantity){
-		stock_consumption += quantity;
-		if(stock_consumption > stock_max_consumption){
-			stock_consumption = stock_max_consumption;
-		}
+	private void addStock_Consomme(float quantity) {
+		stock_consumption = Math.min(stock_consumption + quantity, stock_max_consumption);
 	}
 	
 	/**
 	 * Retire des produits au stock de produit consommé
 	 * @param quantity Quantité de produit retiré
 	 */
-	private void removeStock_Consomme(float quantity){
-		stock_consumption -= quantity;
-		if(stock_consumption < 0){
-			stock_consumption = 0;
-		}
+	private void removeStock_Consomme(float quantity) {
+		stock_consumption = Math.max(stock_consumption - quantity, 0);
 	}
 	
 	/**
 	 * Reduit exponentiellement la satifaction
 	 * @param delta
 	 */
-	private void reduceSatifaction(float delta){ 
+	private void reduceSatifaction(float delta) { 
 		float reduction = (float) (delta * Math.pow(Config.CONST_REDUCE_SATIFACTION, famine)); //TODO
 		satisfaction -= reduction;
 	}
