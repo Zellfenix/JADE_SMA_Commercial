@@ -63,10 +63,10 @@ public class AgentCommercialBehviours extends TickerBehaviour {
 	 */
 	@Override
 	protected void onTick() {
-		float delta = (float) (((new Date()).getTime() - last_update.getTime()) / 1000.0);
+		double delta = (((new Date()).getTime() - last_update.getTime()) / 1000.0);
 		
 		//Message test de log
-		logger.log(Logger.FINE, "Entrée dans onTick. delta="+delta); 
+		logger.log(Logger.INFO, myAgent.getName()+" : Entrée dans onTick. delta="+delta); 
 		
 		myAgentCommercial.produce(delta);
 		myAgentCommercial.consomme(delta);

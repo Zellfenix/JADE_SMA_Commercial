@@ -66,10 +66,10 @@ class AgentCommercialBehvioursListenerModule extends Behaviour {
 	private java.util.logging.Logger logger;
 	private AgentCommercial myAgentCommercial;
 	private AID sender;
+	private boolean stop = false;
 	//
 	private double priceSend;
 	private int quantitySend;
-	private boolean stop = false;
 
 	public AgentCommercialBehvioursListenerModule(AID sender) {
 		super();
@@ -91,7 +91,11 @@ class AgentCommercialBehvioursListenerModule extends Behaviour {
 	public void action() {
 		if(myAgentCommercial != null){
 			MessageTemplate mt = MessageTemplate.and( 
-					MessageTemplate.or( MessageTemplate.MatchPerformative( ACLMessage.CFP ), MessageTemplate.MatchPerformative( ACLMessage.ACCEPT_PROPOSAL )), 
+					MessageTemplate.or( 
+							MessageTemplate.MatchPerformative( ACLMessage.CFP ), 
+							MessageTemplate.or(
+									MessageTemplate.MatchPerformative( ACLMessage.ACCEPT_PROPOSAL ),
+									MessageTemplate.MatchPerformative( ACLMessage.REJECT_PROPOSAL ))), 
 					MessageTemplate.MatchSender(sender) );
 			//MessageTemplate mt = MessageTemplate.MatchSender(sender);
 			ACLMessage msg = myAgent.receive(mt);
@@ -104,6 +108,9 @@ class AgentCommercialBehvioursListenerModule extends Behaviour {
 						break;
 					case ACLMessage.ACCEPT_PROPOSAL:
 						sendConfirm(msg);
+						break;
+					case ACLMessage.REJECT_PROPOSAL:
+						//sendConfirm(msg);
 						break;
 					default:
 						break;
