@@ -12,6 +12,7 @@ import jade.util.Logger;
 import jade.wrapper.AgentContainer;
 import jade.wrapper.AgentController;
 import jade.wrapper.ControllerException;
+import jade.wrapper.StaleProxyException;
 
 import java.util.logging.Level;
 
@@ -43,6 +44,8 @@ public class AgentCommercial extends Agent {
 	private double average_satifaction;
 	private double average_money;
 
+	private int lineage = 0;
+	
 	/**
 	 * Temps passé sans pouvoir consommé de produit
 	 */
@@ -70,8 +73,7 @@ public class AgentCommercial extends Agent {
 		
 		//Ajout des classe Behviours
 		addBehaviour(new AgentCommercialBehviours(this, Config.TICKER_DELAY));
-		addBehaviour(new AgentCommercialBehvioursListener());
-		
+		addBehaviour(new AgentCommercialBehvioursListener());	
 		addBehaviour(new AgentCommercialBehvioursTransaction(this, 1000));
 
 	}
@@ -217,10 +219,10 @@ public class AgentCommercial extends Agent {
 	 */
 	public void update_price(){
 		if(satisfaction >= Config.PRICE_MAX_SATISFACTION && money >= Config.PRICE_MAX_MONEY){
-			price += 1;
+			price += 0.1;
 		}
-		else if(satisfaction >= Config.PRICE_MIN_SATISFACTION && money >= Config.PRICE_MIN_MONEY){
-			price = Math.max(price - 1, 1);
+		else if(satisfaction <= Config.PRICE_MIN_SATISFACTION && money >= Config.PRICE_MIN_MONEY){
+			price = Math.max(price - 0.1, 0.1);
 		}
 	}
 	
@@ -233,7 +235,7 @@ public class AgentCommercial extends Agent {
 			kill();
 		}
 		
-		if(satisfaction == 1.0){//TODO condition de Duplication ?
+		if(satisfaction == 100 && money > Config.INIT_MONEY*1.5){//TODO condition de Duplication ?
 			duplication();
 		}
 		
@@ -278,7 +280,18 @@ public class AgentCommercial extends Agent {
 	}
 	
 	private void duplication(){
-		//TODO
+		AgentContainer c = getContainerController();
+		
+		String[] args = {production.toString(), consumption.toString()};
+		lineage += 1;
+		try {
+			AgentController Agent = c.createNewAgent("Agent"+production.toString()+lineage+"_filsde_"+getLocalName(), "sma.agent.AgentCommercial", args);
+			Agent.start();
+			money -= Config.INIT_MONEY;
+		} catch (StaleProxyException e) {
+			e.printStackTrace();
+		}
+		
 	}
 	
 	/**

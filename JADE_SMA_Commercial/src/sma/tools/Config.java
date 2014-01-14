@@ -21,7 +21,7 @@ public class Config {
 	public static final double PRICE_MIN_SATISFACTION = 90;
 	public static final double PRICE_MAX_SATISFACTION = 100;
 	public static final double PRICE_MIN_MONEY = 150;
-	public static final double PRICE_MAX_MONEY = 200;
+	public static final double PRICE_MAX_MONEY = 230;
 	
 	/**
 	 * Constante de reduction de la satifaction
