@@ -48,6 +48,9 @@ public class AgentCommercial extends Agent {
 	 */
 	private double famine;
 	
+	//Etat de l'agent
+	private boolean is_at_work = true;
+	
 	@Override
 	protected void setup() {
 		super.setup();
@@ -107,6 +110,7 @@ public class AgentCommercial extends Agent {
 		stock_max_consumption = Config.STOCK_MAX_CONSUMPTION;
 		
 		satisfaction = 100;
+		//satisfaction = 10;
 		money = Config.INIT_MONEY;
 		price = Config.INIT_PRICE;
 		
@@ -181,6 +185,7 @@ public class AgentCommercial extends Agent {
 	 */
 	public void produce(double delta, double quantity){
 		double total = quantity * delta;
+		//double total = quantity * delta * 10;
 		addStock_Product(total);
 		if(stock_production == stock_max_production){
 			//Augmentation de la satifaction
@@ -219,6 +224,13 @@ public class AgentCommercial extends Agent {
 		
 		if(satisfaction == 1.0){//TODO condition de Duplication ?
 			duplication();
+		}
+		
+		if(stock_production == stock_max_production && is_at_work == true){
+			satisfaction = Math.min(satisfaction+50, 100);
+			is_at_work = false;
+		}else{
+			is_at_work = true;
 		}
 		
 		if(stock_consumption <= 0){
