@@ -27,13 +27,13 @@ public class AgentCommercial extends Agent {
 	private Logger logger;
 	
 	private Product production;
-	private float stock_production;
-	private float stock_max_production;
-	private float price;
+	private double stock_production;
+	private double stock_max_production;
+	private double price;
 	
 	private Product consumption;
-	private float stock_consumption;
-	private float stock_max_consumption;
+	private double stock_consumption;
+	private double stock_max_consumption;
 	
 	private float money;
 	private float satisfaction;
@@ -42,11 +42,11 @@ public class AgentCommercial extends Agent {
 	private double average_price;
 	private double average_satifaction;
 	private double average_money;
-	
+
 	/**
 	 * Temps passé sans pouvoir consommé de produit
 	 */
-	private float famine;
+	private double famine;
 	
 	@Override
 	protected void setup() {
@@ -179,8 +179,8 @@ public class AgentCommercial extends Agent {
 	 * @param delta Le temps depuis la dernière execution de cette methode
 	 * @param quantity La quantité de produit creé par seconde
 	 */
-	public void produce(float delta, float quantity){
-		float total = quantity * delta;
+	public void produce(double delta, double quantity){
+		double total = quantity * delta;
 		addStock_Product(total);
 		if(stock_production == stock_max_production){
 			//Augmentation de la satifaction
@@ -188,7 +188,7 @@ public class AgentCommercial extends Agent {
 		
 		logger.log(Logger.FINE, "Agent : "+this.getName()+", produce :"+stock_production+"(+"+total+") (+"+quantity+" /sec)");
 	}
-	public void produce(float delta){
+	public void produce(double delta){
 		produce(delta, 1);
 	}
 	
@@ -197,13 +197,13 @@ public class AgentCommercial extends Agent {
 	 * l'agent consomme des ressources
 	 * @param delta Le temps depuis la dernière execution de cette methode
 	 */
-	public void consomme(float delta, float quantity){
-		float total = quantity * delta;
+	public void consomme(double delta, double quantity){
+		double total = quantity * delta;
 		removeStock_Consomme(total);
 		
 		logger.log(Logger.FINE, "Agent : "+this.getName()+", consomme :"+stock_consumption+"(-"+total+") (-"+quantity+" /sec)");
 	}
-	public void consomme(float delta){
+	public void consomme(double delta){
 		consomme(delta, 1);
 	}
 	
@@ -211,7 +211,7 @@ public class AgentCommercial extends Agent {
 	/**
 	 * Vérifie la satifaction et effectue les opérations nécéssaires
 	 */
-	public void check_satisfaction(float delta){
+	public void check_satisfaction(double delta){
 		if(satisfaction <= 0.0){
 			logger.log(Logger.INFO, "Agent : "+this.getName()+", is starving to death !");
 			kill();
@@ -225,7 +225,8 @@ public class AgentCommercial extends Agent {
 			famine += delta;// * 1;
 			reduceSatifaction(delta);
 			logger.log(Logger.FINE, "Agent : "+this.getName()+", Famine increased to "+famine+" !");
-		}else{
+		}else{			
+			satisfaction = Math.min(satisfaction + 10, 100);	
 			famine = 0;
 		}
 	}
@@ -261,7 +262,7 @@ public class AgentCommercial extends Agent {
 	 * Ajoute des produits au stock de produit creé
 	 * @param quantity Quantité de produit ajouté
 	 */
-	private void addStock_Product(float quantity){
+	private void addStock_Product(double quantity){
 		stock_production += quantity;
 		if(stock_production > stock_max_production){
 			stock_production = stock_max_production;
@@ -272,7 +273,7 @@ public class AgentCommercial extends Agent {
 	 * Retire des produits au stock de produit creé
 	 * @param quantity Quantité de produit retiré
 	 */
-	private void removeStock_Product(float quantity){
+	private void removeStock_Product(double quantity){
 		stock_production -= quantity;
 		if(stock_production < 0){
 			stock_production = 0;
@@ -283,7 +284,7 @@ public class AgentCommercial extends Agent {
 	 * Ajoute des produits au stock de produit consommé
 	 * @param quantity Quantité de produit ajouté
 	 */
-	private void addStock_Consomme(float quantity){
+	private void addStock_Consomme(double quantity){
 		stock_consumption += quantity;
 		if(stock_consumption > stock_max_consumption){
 			stock_consumption = stock_max_consumption;
@@ -294,7 +295,7 @@ public class AgentCommercial extends Agent {
 	 * Retire des produits au stock de produit consommé
 	 * @param quantity Quantité de produit retiré
 	 */
-	private void removeStock_Consomme(float quantity){
+	private void removeStock_Consomme(double quantity){
 		stock_consumption -= quantity;
 		if(stock_consumption < 0){
 			stock_consumption = 0;
@@ -303,16 +304,21 @@ public class AgentCommercial extends Agent {
 	
 	/**
 	 * Reduit exponentiellement la satifaction
+	 * 100-exp( (x/5.35) - 1)
 	 * @param delta
 	 */
-	private void reduceSatifaction(float delta){ 
-		float reduction = (float) (delta * Math.pow(Config.CONST_REDUCE_SATIFACTION, famine)); //TODO
-		satisfaction -= reduction;
+	private void reduceSatifaction(double delta){ 
+		//double reduction = (double) (delta * Math.pow(Config.CONST_REDUCE_SATIFACTION, famine)); //TODO
+		
+		//double reduction = satisfaction - Math.exp( famine /5.35 - 1.0);
+		//double reduction = 100.0 - satisfaction;
+		//satisfaction = reduction;
+		satisfaction -= Math.exp( famine /5.35 - 1.0);
 	}
 	
 	//-----------------------Transactions Methodes--------------------------------
 	
-	public synchronized void sell(int quantity, float price) {
+	public synchronized void sell(int quantity, double price) {
 		logger.log(Level.INFO, "Sell "+quantity+" for "+price+" $");
 		stock_production -= quantity;
 		money += price * quantity;
@@ -330,11 +336,11 @@ public class AgentCommercial extends Agent {
 		return consumption;
 	}
 	
-	public float getStock_consumption() {
+	public double getStock_consumption() {
 		return stock_consumption;
 	}
 	
-	public float getStock_max_consumption() {
+	public double getStock_max_consumption() {
 		return stock_max_consumption;
 	}
 	
@@ -342,27 +348,27 @@ public class AgentCommercial extends Agent {
 		return production;
 	}
 	
-	public float getStock_production() {
+	public double getStock_production() {
 		return stock_production;
 	}
 	
-	public float getStock_max_production() {
+	public double getStock_max_production() {
 		return stock_max_production;
 	}
 	
-	public float getPrice() {
+	public double getPrice() {
 		return price;
 	}
 	
-	public float getSatisfaction() {
+	public double getSatisfaction() {
 		return satisfaction;
 	}
 	
-	public float getFamine() {
+	public double getFamine() {
 		return famine;
 	}
 	
-	public float getMoney() {
+	public double getMoney() {
 		return money;
 	}
 	

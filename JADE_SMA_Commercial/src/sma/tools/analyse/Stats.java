@@ -10,16 +10,16 @@ public class Stats {
 	private String status;
 	
 	private Product production;
-	private float stock_production;
-	private float stock_max_production;
-	private float price;
+	private double stock_production;
+	private double stock_max_production;
+	private double price;
 	
 	private Product consumption;
-	private float stock_consumption;
-	private float stock_max_consumption;
+	private double stock_consumption;
+	private double stock_max_consumption;
 	
-	private float money;
-	private float satisfaction;
+	private double money;
+	private double satisfaction;
 	
 	private double average_price;
 	private double average_satifaction;
@@ -57,15 +57,15 @@ public class Stats {
 		return production;
 	}
 
-	public float getStock_production() {
+	public double getStock_production() {
 		return stock_production;
 	}
 
-	public float getStock_max_production() {
+	public double getStock_max_production() {
 		return stock_max_production;
 	}
 
-	public float getPrice() {
+	public double getPrice() {
 		return price;
 	}
 
@@ -73,19 +73,19 @@ public class Stats {
 		return consumption;
 	}
 
-	public float getStock_consumption() {
+	public double getStock_consumption() {
 		return stock_consumption;
 	}
 
-	public float getStock_max_consumption() {
+	public double getStock_max_consumption() {
 		return stock_max_consumption;
 	}
 
-	public float getMoney() {
+	public double getMoney() {
 		return money;
 	}
 
-	public float getSatisfaction() {
+	public double getSatisfaction() {
 		return satisfaction;
 	}
 	

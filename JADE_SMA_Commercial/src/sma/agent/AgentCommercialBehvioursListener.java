@@ -67,7 +67,7 @@ class AgentCommercialBehvioursListenerModule extends Behaviour {
 	private AgentCommercial myAgentCommercial;
 	private AID sender;
 	//
-	private float priceSend;
+	private double priceSend;
 	private int quantitySend;
 	private boolean stop = false;
 
