@@ -118,7 +118,7 @@ public class Analyse extends JFrame {
 		panel_charts.updateUI();
 		panel_charts.repaint();
 	}
-
+	
 	public void agent_dead(AgentCommercial agentCommercial){
 		agent_stats.get(agentCommercial.getName()).update(agentCommercial);
 		tableModel.fireTableDataChanged();
