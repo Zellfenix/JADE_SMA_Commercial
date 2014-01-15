@@ -25,6 +25,7 @@ public class FirstSimTest extends Agent{
 			String[] argsB = {"B", "C"};
 			String[] argsC = {"C", "A"};
 			
+			
 			AgentController AgentA1 = c.createNewAgent("AgentA1", "sma.agent.AgentCommercial", argsA);
 			AgentController AgentB1 = c.createNewAgent("AgentB1", "sma.agent.AgentCommercial", argsB);
 			//AgentController AgentA2 = c.createNewAgent("AgentA2", "sma.agent.AgentCommercial", argsA);

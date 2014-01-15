@@ -162,6 +162,7 @@ class AgentCommercialBehvioursListenerModule extends Behaviour {
 				quantityR = Integer.parseInt(msg.getContent().split(" ")[1]);
 			} catch (NumberFormatException e) {
 				e.printStackTrace();
+				
 				return;
 			}
 			//Check Quantity

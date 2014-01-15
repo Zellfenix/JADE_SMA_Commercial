@@ -23,6 +23,7 @@ public class Config {
 	public static final double PRICE_MIN_MONEY = 50;
 	public static final double PRICE_MAX_MONEY = 110;
 	
+	
 	/**
 	 * Constante de reduction de la satifaction
 	 * Voir methode: private void reduceSatifaction(float delta)

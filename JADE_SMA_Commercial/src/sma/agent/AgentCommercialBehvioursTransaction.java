@@ -227,6 +227,7 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 		msg.setContent("ACCEPT_PROPOSAL "+quantity);
 		msg.addReceiver(aid);
 		myAgent.send(msg);
+		
 	}
 
 	private void sendReject_Proposal(AID aid){
@@ -234,6 +235,7 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 		msg.setContent("REJECT_PROPOSAL");
 		msg.addReceiver(aid);
 		myAgent.send(msg);
+		
 	}
 
 	private void executeTransaction(int quantity, double price) {

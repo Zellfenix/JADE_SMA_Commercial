@@ -36,6 +36,7 @@ public class AgentCommercialBehviours extends TickerBehaviour {
 		//Permet de fixer la durée d'un tick a la valeur "period"
 		setFixedPeriod(true);
 		
+		
 		myAgentCommercial = (AgentCommercial) myAgent;
 		
 		logger = Logger.getMyLogger(this.getClass().getName());
