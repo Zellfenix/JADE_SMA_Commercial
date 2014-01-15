@@ -97,6 +97,9 @@ public class Stats {
 	}
 	
 	public String getStatus() {
+		if(status == null){
+			return "";
+		}
 		return status;
 	}
 	
