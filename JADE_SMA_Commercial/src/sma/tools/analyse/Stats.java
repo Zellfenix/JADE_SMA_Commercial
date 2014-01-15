@@ -8,6 +8,7 @@ public class Stats {
 	private String name;
 	
 	private String status;
+	private double life_time;
 	
 	private Product production;
 	private double stock_production;
@@ -31,6 +32,8 @@ public class Stats {
 
 	public void update(AgentCommercial agent){
 		name = agent.getName();
+		
+		life_time = agent.getLife_time();
 		
 		production = agent.getProduction();
 		stock_production = agent.getStock_production();
@@ -107,6 +110,10 @@ public class Stats {
 	
 	public double getAverage_satifaction() {
 		return average_satifaction;
+	}
+	
+	public double getLife_time() {
+		return life_time;
 	}
 	
 }
