@@ -1,1 +1,1 @@
-http://Antoine-PC.connectify:7778/acc
+http://Cymoud-ThinkPad:7778/acc
