@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
+import javax.swing.Box;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -33,7 +34,7 @@ public class Analyse extends JFrame {
 	private JTabbedPane tabbedPane;
 	private JPanel panel_stats;
 	private JPanel panel_graphe;
-	private JPanel panel_charts;
+	private Box panel_charts;
 	private JTable jtable;
 	private TableModelDynamique tableModel;
 
@@ -73,7 +74,7 @@ public class Analyse extends JFrame {
 		panel_graphe = new JPanel();
 		panel_graphe.setLayout(new CircleLayout());
 
-		panel_charts = new JPanel();
+		panel_charts = Box.createVerticalBox();
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		tabbedPane.addTab("Graphe", panel_graphe);
