@@ -34,7 +34,7 @@ public class AgentCommercialBehviours extends TickerBehaviour {
 	public AgentCommercialBehviours(Agent a, long period) {
 		super(a, period);
 		//Permet de fixer la durée d'un tick a la valeur "period"
-		setFixedPeriod(false);
+		setFixedPeriod(true);
 		
 		myAgentCommercial = (AgentCommercial) myAgent;
 		
