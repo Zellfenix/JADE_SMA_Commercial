@@ -83,8 +83,10 @@ public class AgentChart extends JPanel implements DatasetChangeListener {
 	}
 
 	public void update(int count, Stats stats) {
-		if (count-20 >= 0)
-			dataset.removeColumn(""+(count-20)%20);
+		try {
+			if (count-20 >= 0)
+				dataset.removeColumn(""+(count-20)%20);
+		} catch (Exception e) {}
 		dataset.setValue(stats.getSatisfaction(),		"satisfaction",	""+count%20);
 		dataset.setValue(stats.getStock_production(),	"stock_prod",	""+count%20);
 		dataset.setValue(stats.getPrice(),				"price",		""+count%20);
