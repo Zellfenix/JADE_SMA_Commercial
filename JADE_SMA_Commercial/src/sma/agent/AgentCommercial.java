@@ -57,6 +57,7 @@ public class AgentCommercial extends Agent {
 	
 	//Etat de l'agent
 	private boolean is_at_work = true;
+	private int lifeState = 1; // 0 : survie, 1 : normal, 2 : reproduction
 	
 	@Override
 	protected void setup() {
@@ -115,7 +116,7 @@ public class AgentCommercial extends Agent {
 		stock_production = 0;
 		stock_max_production = Config.STOCK_MAX_PRODUCTION;
 		
-		stock_consumption =  Config.STOCK_MAX_CONSUMPTION * 1/4; //0;
+		stock_consumption =  Config.INIT_CONSUMPTION;
 		stock_max_consumption = Config.STOCK_MAX_CONSUMPTION;
 		
 		satisfaction = 100;
@@ -232,6 +233,17 @@ public class AgentCommercial extends Agent {
 		}
 	}
 	
+	public void check_lifeState(){
+		if(satisfaction < 50.0){
+			lifeState = 0;
+		}else if(satisfaction == 100 && money >= Config.INIT_MONEY*1.5){
+			lifeState = 2;
+		}else{
+			lifeState = 1;
+		}
+	}
+	
+	
 	/**
 	 * Vérifie la satifaction et effectue les opérations nécéssaires
 	 */
@@ -241,7 +253,7 @@ public class AgentCommercial extends Agent {
 			kill();
 		}
 		
-		if(satisfaction == 100 && money > Config.INIT_MONEY*1.5){
+		if(lifeState == 2 && stock_consumption >= Config.INIT_CONSUMPTION){
 			duplication();
 		}
 		
@@ -260,6 +272,12 @@ public class AgentCommercial extends Agent {
 			satisfaction = Math.min(satisfaction + 10, 100);	
 			famine = 0;
 		}
+		
+		
+		
+		
+		
+		
 	}
 	
 	public void compute_stats(double delta) {
@@ -336,6 +354,7 @@ public class AgentCommercial extends Agent {
 			AgentController Agent = c.createNewAgent("Agent"+production.toString()+lineage+"_filsde_"+getLocalName(), "sma.agent.AgentCommercial", args);
 			Agent.start();
 			money -= Config.INIT_MONEY;
+			stock_consumption -= Config.INIT_CONSUMPTION;
 		} catch (StaleProxyException e) {
 			e.printStackTrace();
 		}
@@ -471,6 +490,10 @@ public class AgentCommercial extends Agent {
 	
 	public double getLife_time() {
 		return life_time;
+	}
+	
+	public double getLifeState(){
+		return lifeState;
 	}
 	
 	//----------------------ToString-----------------------------------------------

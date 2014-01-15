@@ -71,6 +71,7 @@ public class AgentCommercialBehviours extends TickerBehaviour {
 		myAgentCommercial.consomme(delta);
 		myAgentCommercial.check_satisfaction(delta);
 		myAgentCommercial.update_price();
+		myAgentCommercial.check_lifeState();
 		myAgentCommercial.compute_stats(delta);
 		
 		last_update = new Date();
