@@ -100,7 +100,7 @@ class AgentCommercialBehvioursListenerModule extends Behaviour {
 			//MessageTemplate mt = MessageTemplate.MatchSender(sender);
 			ACLMessage msg = myAgent.receive(mt);
 			if(msg != null) {
-				logger.log(Logger.INFO, "ControlerAgent Receive("+myAgent.getName()+"):"+msg);
+				logger.log(Logger.INFO, "ControlerAgent Receive("+myAgent.getLocalName()+"):"+msg.getContent());
 				
 				switch(msg.getPerformative()){
 					case ACLMessage.CFP:
@@ -146,7 +146,7 @@ class AgentCommercialBehvioursListenerModule extends Behaviour {
 	public void sendPropose(ACLMessage msg){
 		ACLMessage reply = msg.createReply();
 		
-		quantitySend = (int)myAgentCommercial.getStock_production();
+		quantitySend = (int)Math.max(myAgentCommercial.getStock_production()-1,0);
 		priceSend = myAgentCommercial.getPrice();
 		
 		reply.setPerformative(ACLMessage.PROPOSE);
@@ -156,12 +156,13 @@ class AgentCommercialBehvioursListenerModule extends Behaviour {
 	
 	public synchronized void sendConfirm(ACLMessage msg) {
 		//Check Price
-		if(priceSend == myAgentCommercial.getPrice()){
+//		if(priceSend == myAgentCommercial.getPrice()){
 			int quantityR;
 			try {
 				quantityR = Integer.parseInt(msg.getContent().split(" ")[1]);
 			} catch (NumberFormatException e) {
 				e.printStackTrace();
+				
 				return;
 			}
 			//Check Quantity
@@ -171,7 +172,7 @@ class AgentCommercialBehvioursListenerModule extends Behaviour {
 				reply.setPerformative(ACLMessage.CONFIRM);
 				reply.setContent("CONFIRM "+quantityR+" "+priceSend);
 				myAgent.send(reply);
-				logger.log(Level.INFO, myAgent.getName()+" :Transaction accepted! Send Confirm!");
+				logger.log(Level.INFO, myAgent.getLocalName()+" :Transaction accepted! Send Confirm!");
 				
 				//Execute transaction
 				myAgentCommercial.sell(quantityR, priceSend);
@@ -179,14 +180,16 @@ class AgentCommercialBehvioursListenerModule extends Behaviour {
 				ACLMessage reply = msg.createReply();
 				reply.setPerformative(ACLMessage.CANCEL);
 				myAgent.send(reply);
-				logger.log(Level.INFO, myAgent.getName()+" :Transaction refused! Not enough produc!t");
+				logger.log(Level.INFO, myAgent.getLocalName()+" :Transaction refused! Not enough produc!t");
 			}
-		}else{
+/*
+	}else{
 			ACLMessage reply = msg.createReply();
 			reply.setPerformative(ACLMessage.CANCEL);
 			myAgent.send(reply);
 			logger.log(Level.INFO, myAgent.getName()+" : Price change! ReSend propose!");
 		}
+*/
 	}
 	
 }
