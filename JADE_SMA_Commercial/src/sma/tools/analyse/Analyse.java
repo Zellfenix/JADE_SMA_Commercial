@@ -26,13 +26,13 @@ public class Analyse extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private static Analyse instance;
 	
-	//protected HashMap<String, AgentRepresentation> agents;
+	protected HashMap<String, AgentRepresentation> agents;
 	protected HashMap<String, Stats> agent_stats;
 	protected HashMap<String, AgentChart> agent_chart;
 	
 	private JTabbedPane tabbedPane;
 	private JPanel panel_stats;
-	//private JPanel panel_graphe;
+	private JPanel panel_graphe;
 	private JPanel panel_charts;
 	private JTable jtable;
 	private TableModelDynamique tableModel;
@@ -54,7 +54,7 @@ public class Analyse extends JFrame {
 	}
 	
 	private void init(){
-		//agents = new HashMap<String, AgentRepresentation>(2);
+		agents = new HashMap<String, AgentRepresentation>(2);
 		agent_stats = new HashMap<String, Stats>(2);
 		agent_chart = new HashMap<String, AgentChart>(2);
 		
@@ -70,14 +70,13 @@ public class Analyse extends JFrame {
 		panel_stats.add(jtable.getTableHeader(), BorderLayout.NORTH);
 		panel_stats.add(jtable, BorderLayout.CENTER);
 		
-		//panel_graphe = new JPanel();
-		//panel_graphe.setLayout(new CircleLayout());
+		panel_graphe = new JPanel();
+		panel_graphe.setLayout(new CircleLayout());
 
 		panel_charts = new JPanel();
-		//panel_chart.setLayout(new CircleLayout());
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		//tabbedPane.addTab("Graphe", panel_graphe);
+		tabbedPane.addTab("Graphe", panel_graphe);
 		tabbedPane.addTab("Statistiques", panel_stats);
 		tabbedPane.addTab("Graphiques", new JScrollPane(panel_charts));
 		getContentPane().add(tabbedPane);
@@ -88,21 +87,21 @@ public class Analyse extends JFrame {
 	}
 	
 	public void agent_setup(AgentCommercial agentCommercial){
-		//AgentRepresentation agentRepresentation = new AgentRepresentation();
-		//panel_graphe.add(agentRepresentation);
-		//agents.put(agentCommercial.getName(), agentRepresentation);
+		AgentRepresentation agentRepresentation = new AgentRepresentation();
+		panel_graphe.add(agentRepresentation);
+		agents.put(agentCommercial.getName(), agentRepresentation);
 		
 		agent_stats.put(agentCommercial.getName(), new Stats(agentCommercial));
 		tableModel.setStats( new ArrayList<Stats>(agent_stats.values()) );
 		
-		//panel_graphe.setSize(getPreferredSize().width, getPreferredSize().height);
+		panel_graphe.setSize(getPreferredSize().width, getPreferredSize().height);
 		//pack();
 	}
 	
 	public void agent_update(AgentCommercial agentCommercial){
 		agent_stats.get(agentCommercial.getName()).update(agentCommercial);
 		tableModel.fireTableDataChanged();
-		//agents.get(agentCommercial.getName()).update(agentCommercial);
+		agents.get(agentCommercial.getName()).update(agentCommercial);
 		agent_stats.get(agentCommercial.getName()).setStatus("Alive");
 
 		if (System.currentTimeMillis() - last_update >= 500) {
@@ -115,9 +114,9 @@ public class Analyse extends JFrame {
 				agent_chart.get(e.getKey()).update(count, e.getValue());
 			}
 			count++;
-			panel_charts.getParent().invalidate();
-			panel_charts.getParent().revalidate();
-			panel_charts.getParent().repaint();
+			panel_charts.invalidate();
+			panel_charts.revalidate();
+			panel_charts.repaint();
 			last_update = System.currentTimeMillis();
 		}
 	}
@@ -125,7 +124,7 @@ public class Analyse extends JFrame {
 	public void agent_dead(AgentCommercial agentCommercial){
 		agent_stats.get(agentCommercial.getName()).update(agentCommercial);
 		tableModel.fireTableDataChanged();
-		//agents.get(agentCommercial.getName()).update(agentCommercial);
+		agents.get(agentCommercial.getName()).update(agentCommercial);
 		agent_stats.get(agentCommercial.getName()).setStatus("Dead");
 	}
 
