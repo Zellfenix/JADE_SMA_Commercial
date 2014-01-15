@@ -55,27 +55,41 @@ public class AgentChart extends JPanel implements DatasetChangeListener {
 		renderer.setSeriesStroke(
     		1, new BasicStroke(
 				2.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND,
-				1.0f, new float[] {6.0f, 6.0f}, 0.0f
+				1.0f, new float[] {10.0f, 6.0f}, 0.0f
+			)
+		);
+		renderer.setSeriesStroke(
+    		2, new BasicStroke(
+				2.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND,
+				1.0f, new float[] {10.0f, 6.0f}, 0.0f
 			)
 		);
 		renderer.setSeriesStroke(
     		3, new BasicStroke(
 				2.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND,
-				1.0f, new float[] {2.0f, 6.0f}, 0.0f
+				1.0f, new float[] {10.0f, 6.0f}, 0.0f
+			)
+		);
+		renderer.setSeriesStroke(
+    		4, new BasicStroke(
+				2.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND,
+				1.0f, new float[] {10.0f, 6.0f}, 0.0f
 			)
 		);
 
         chartPanel = new ChartPanel(chart);
         add(chartPanel);
-        setPreferredSize(new Dimension(500,500));
+        setPreferredSize(new Dimension(450,400));
 	}
 
 	public void update(int count, Stats stats) {
-		dataset.setValue(stats.getSatisfaction(),		"satisfaction",	""+count);
-		dataset.setValue(stats.getStock_production(),	"stock_prod",	""+count);
-		dataset.setValue(stats.getPrice(),				"price",		""+count);
-		dataset.setValue(stats.getStock_consumption(),	"stock_cons",	""+count);
-		dataset.setValue(stats.getMoney(),				"money",		""+count);
+		if (count-20 >= 0)
+			dataset.removeColumn(""+(count-20)%20);
+		dataset.setValue(stats.getSatisfaction(),		"satisfaction",	""+count%20);
+		dataset.setValue(stats.getStock_production(),	"stock_prod",	""+count%20);
+		dataset.setValue(stats.getPrice(),				"price",		""+count%20);
+		dataset.setValue(stats.getStock_consumption(),	"stock_cons",	""+count%20);
+		dataset.setValue(stats.getMoney(),				"money",		""+count%20);
 	}
 
 	@Override
