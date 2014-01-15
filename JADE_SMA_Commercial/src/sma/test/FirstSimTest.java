@@ -28,10 +28,10 @@ public class FirstSimTest extends Agent{
 			
 			AgentController AgentA1 = c.createNewAgent("AgentA1", "sma.agent.AgentCommercial", argsA);
 			AgentController AgentB1 = c.createNewAgent("AgentB1", "sma.agent.AgentCommercial", argsB);
-			//AgentController AgentA2 = c.createNewAgent("AgentA2", "sma.agent.AgentCommercial", argsA);
-			//AgentController AgentB2 = c.createNewAgent("AgentB2", "sma.agent.AgentCommercial", argsB);
+			AgentController AgentA2 = c.createNewAgent("AgentA2", "sma.agent.AgentCommercial", argsA);
+			AgentController AgentB2 = c.createNewAgent("AgentB2", "sma.agent.AgentCommercial", argsB);
 			AgentController AgentC1 = c.createNewAgent("AgentC1", "sma.agent.AgentCommercial", argsC);
-			//AgentController AgentC2 = c.createNewAgent("AgentC2", "sma.agent.AgentCommercial", argsC);
+			AgentController AgentC2 = c.createNewAgent("AgentC2", "sma.agent.AgentCommercial", argsC);
 			
 			Analyser.start();
 			AgentA1.start();

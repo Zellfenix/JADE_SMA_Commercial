@@ -65,7 +65,7 @@ public class AgentCommercialBehviours extends TickerBehaviour {
 		double delta = (((new Date()).getTime() - last_update.getTime()) / 1000.0);
 		
 		//Message test de log
-		logger.log(Logger.INFO, myAgent.getName()+" : Entrée dans onTick. delta="+delta); 
+		logger.log(Logger.FINE, myAgent.getName()+" : Entrée dans onTick. delta="+delta); 
 		
 		myAgentCommercial.produce(delta);
 		myAgentCommercial.consomme(delta);

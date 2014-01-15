@@ -29,6 +29,12 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 	//Regroupe les prix de chaque agent
 	private HashMap<AID, Double[]> price_table;
 	private int init_quantity;
+	
+	private int state;
+
+	private AID min_seller;
+	private int min_quantity;
+	private double min_price;
 
 	public AgentCommercialBehvioursTransaction(Agent a, long period) {
 		super(a, period);
@@ -40,6 +46,7 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 		this.init_quantity = 1;
 
 		logger.log(Logger.CONFIG, "Create AgentCommercialBehvioursTransaction");
+		
 	}
 
 	@Override
@@ -52,13 +59,15 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 		//Behaviour de recherche d'un vendeur
 		//myAgent.addBehaviour(new PriceResearch(myAgent, 5000));
 		//myAgent.addBehaviour(new PriceResearch(myAgent, 1000));
-
+/*
 		try {
 			Thread.sleep(1000);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		*/
+		state = 0;
 	}
 
 	@Override
@@ -68,10 +77,12 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 			return;
 		}
 
+		if(state == 4){
+			state = 0;
+		}
+		
 		//Achete
-		//System.out.println("pouet");
 		pricesResearch();
-		//	System.out.println("pouet price");
 		buyProduct();
 
 	}
@@ -101,18 +112,21 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 	private void pricesResearch(){
 		//Recuperation des resultats depuis le DF
 		DFAgentDescription[] sellers = myAgentCommercial.search();
-		int nb_reponce = 0;
-		int nb_try = 0;
-		price_table.clear();
-
+		//int nb_reponce = 0;
+		//int nb_try = 0;
+		
 		//Envois des CFP
-		for(DFAgentDescription seller : sellers){
-			sendCFP(seller.getName());
+		if(state == 0){
+			price_table.clear();
+			for(DFAgentDescription seller : sellers){
+				sendCFP(seller.getName());
+			}
+			state = 1;
 		}
-
+		
 		//Attente des reponses
-		while(price_table.size() < sellers.length && nb_try < 100){
-			nb_try++;
+		if(price_table.size() < sellers.length && state == 1){
+			//nb_try++;
 			//MessageTemplate mt = MessageTemplate.or( MessageTemplate.MatchPerformative( ACLMessage.PROPOSE ), MessageTemplate.MatchPerformative( ACLMessage.CONFIRM ));
 			MessageTemplate mt = MessageTemplate.MatchPerformative( ACLMessage.PROPOSE );
 			ACLMessage msg = myAgent.receive(mt);
@@ -138,6 +152,8 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 					break;
 				}
 			}
+		}else if(state == 1){
+			state = 2;
 		}
 	}
 
@@ -146,54 +162,61 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 	 */
 	private void buyProduct(){
 		boolean one_is_accepted = false;
-		if(price_table.size() > 0){
-			//Init variables
-			//int quantity = init_quantity;
-			double min_price = Config.INFINI;
-			AID min_seller = null;
-			int min_quantity = 0;
-
-			//Recherche du vendeur le moins chere dans le tableau de prix
-			for(AID seller : price_table.keySet()){
-				Double[] price_tmp = price_table.get(seller);
-
-				if((price_tmp[0] < min_price && price_tmp[1].intValue() > 0) || min_seller == null){ //TODO
-					min_price = price_tmp[0];
-					min_seller = seller;
-					min_quantity = moreSuitableQuantity(price_tmp[0],price_tmp[1].intValue());
+		if(price_table.size() > 0 && state >= 2){
+			if(state == 2){
+					
+				//Init variables
+				//int quantity = init_quantity;
+				min_price = Config.INFINI;
+				min_seller = null;
+				min_quantity = 0;
+	
+				//Recherche du vendeur le moins chere dans le tableau de prix
+				for(AID seller : price_table.keySet()){
+					Double[] price_tmp = price_table.get(seller);
+	
+					if((price_tmp[0] < min_price && price_tmp[1].intValue() > 0) || min_seller == null){ //TODO
+						min_price = price_tmp[0];
+						min_seller = seller;
+						min_quantity = moreSuitableQuantity(price_tmp[0],price_tmp[1].intValue());
+					}
 				}
-			}
-			/*	
-			//Vérification de la quantité disponible
-			if(min_quantity < quantity){
-				quantity = min_quantity;
-				return; //TODO
-			}
-			//Vérification de la quantité demandé
-			if(min_quantity == 0){
-				return;
-			}
-			 */	
-
-			//Envois de l'acceptation
-			for(AID seller : price_table.keySet()){
-				if(seller.equals(min_seller) == false){
-					sendReject_Proposal(seller);
-				}else{
-					if(min_quantity == 0){
+				/*	
+				//Vérification de la quantité disponible
+				if(min_quantity < quantity){
+					quantity = min_quantity;
+					return; //TODO
+				}
+				//Vérification de la quantité demandé
+				if(min_quantity == 0){
+					return;
+				}
+				 */	
+	
+				//Envois de l'acceptation
+			
+				for(AID seller : price_table.keySet()){
+					if(seller.equals(min_seller) == false){
 						sendReject_Proposal(seller);
 					}else{
-						sendAccept_Proposal(min_seller, min_quantity, min_price);
-						one_is_accepted = true;
+						if(min_quantity == 0){
+							sendReject_Proposal(seller);
+							System.out.println("QUANTITY = 0");
+							state = 4;
+						}else{
+							sendAccept_Proposal(min_seller, min_quantity, min_price);
+							one_is_accepted = true;
+							state = 3;
+						}
 					}
 				}
 			}
 
-			if(one_is_accepted == true){
+			if(one_is_accepted == true || state == 3){
 				//Attente de la confirmation
 				int nb_reponce = 0;
 				int nb_try = 0;
-				while(nb_reponce < 1 /*&& nb_try < 100*/){
+				if(nb_reponce < 1/*&& nb_try < 100*/){
 					nb_try++;
 					MessageTemplate mt = MessageTemplate.or(MessageTemplate.MatchPerformative( ACLMessage.CONFIRM ), MessageTemplate.MatchPerformative( ACLMessage.CANCEL ));
 					ACLMessage msg = myAgent.receive(mt);
@@ -202,14 +225,20 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 						nb_reponce++;
 						switch(msg.getPerformative()){	
 						case ACLMessage.CONFIRM:
-							if(min_seller != null && min_price != Config.INFINI)
+							//if(min_seller != null && min_price != Config.INFINI)
 								executeTransaction(min_quantity, min_price);
+							state = 4;
 							break;
 						case ACLMessage.CANCEL:
+							state = 4;
 							break;
 						default:
 							break;
 						}
+					}else{
+						/*try {
+							Thread.sleep(1000);
+						} catch (InterruptedException e) {e.printStackTrace();}*/
 					}
 				}
 			}
