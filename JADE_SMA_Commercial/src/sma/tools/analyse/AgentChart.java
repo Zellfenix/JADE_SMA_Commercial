@@ -79,19 +79,19 @@ public class AgentChart extends JPanel implements DatasetChangeListener {
 
         chartPanel = new ChartPanel(chart);
         add(chartPanel);
-        setPreferredSize(new Dimension(450,400));
+        setPreferredSize(new Dimension(450,300));
 	}
 
 	public void update(int count, Stats stats) {
-		try {
+		/*try {
 			if (count-20 >= 0)
 				dataset.removeColumn(""+(count-20)%20);
-		} catch (Exception e) {}
-		dataset.setValue(stats.getSatisfaction(),		"satisfaction",	""+count%20);
-		dataset.setValue(stats.getStock_production(),	"stock_prod",	""+count%20);
-		dataset.setValue(stats.getPrice(),				"price",		""+count%20);
-		dataset.setValue(stats.getStock_consumption(),	"stock_cons",	""+count%20);
-		dataset.setValue(stats.getMoney(),				"money",		""+count%20);
+		} catch (Exception e) {}*/
+		dataset.setValue(stats.getSatisfaction(),		"satisfaction",	""+count);
+		dataset.setValue(stats.getStock_production(),	"stock_prod",	""+count);
+		dataset.setValue(stats.getPrice(),				"price",		""+count);
+		dataset.setValue(stats.getStock_consumption(),	"stock_cons",	""+count);
+		dataset.setValue(stats.getMoney(),				"money",		""+count);
 	}
 
 	@Override
