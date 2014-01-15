@@ -34,10 +34,12 @@ public class Analyse extends JFrame {
 	private JPanel panel_stats;
 	//private JPanel panel_graphe;
 	private JPanel panel_charts;
+	private JTable jtable;
 	private TableModelDynamique tableModel;
 
 	private int count = 0;
 	private long last_update = System.currentTimeMillis();
+
 
 	public Analyse() throws HeadlessException {
 		super();
@@ -61,7 +63,10 @@ public class Analyse extends JFrame {
 		panel_stats = new JPanel();
 		panel_stats.setLayout(new BorderLayout());
 		tableModel = new TableModelDynamique();
-		JTable jtable = new JTable(tableModel);
+		
+		jtable = new JTable(tableModel);
+		jtable.setDefaultRenderer(Object.class, new MyRenderer());
+		
 		panel_stats.add(jtable.getTableHeader(), BorderLayout.NORTH);
 		panel_stats.add(jtable, BorderLayout.CENTER);
 		
