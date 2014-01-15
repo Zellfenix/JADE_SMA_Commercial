@@ -39,8 +39,8 @@ public class AgentCommercial extends Agent {
 	private double stock_consumption;
 	private double stock_max_consumption;
 	
-	private float money;
-	private float satisfaction;
+	private double money;
+	private double satisfaction;
 	
 	private int iteration = 0;
 	private double average_price;
@@ -397,7 +397,8 @@ public class AgentCommercial extends Agent {
 		//double reduction = satisfaction - Math.exp( famine /5.35 - 1.0);
 		//double reduction = 100.0 - satisfaction;
 		//satisfaction = reduction;
-		satisfaction -= Math.exp( famine /5.35 - 1.0);
+		//satisfaction -= Math.exp( famine /5.35 - 1.0);
+		satisfaction -= Math.exp( famine /10 - 1.0);
 	}
 	
 	//-----------------------Transactions Methodes--------------------------------
