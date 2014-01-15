@@ -210,6 +210,10 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 						default:
 							break;
 						}
+					}else{
+						try {
+							Thread.sleep(500);
+						} catch (InterruptedException e) {e.printStackTrace();}
 					}
 				}
 			}
