@@ -255,7 +255,8 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 				//Attente de la confirmation
 				int nb_reponce = 0;
 				int nb_try = 0;
-				if(nb_reponce < 1/*&& nb_try < 100*/){
+				
+				if(nb_reponce < 1 ){					
 					nb_try++;
 					MessageTemplate mt = MessageTemplate.and(
 							MessageTemplate.or(MessageTemplate.MatchPerformative( ACLMessage.CONFIRM ), MessageTemplate.MatchPerformative( ACLMessage.CANCEL ))
