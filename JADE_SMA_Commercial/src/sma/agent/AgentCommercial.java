@@ -204,7 +204,7 @@ public class AgentCommercial extends Agent {
 		logger.log(Logger.FINE, "Agent : "+this.getName()+", produce :"+stock_production+"(+"+total+") (+"+quantity+" /sec)");
 	}
 	public void produce(double delta){
-		produce(delta, 1);
+		produce(delta, Config.CONST_PROD);
 	}
 	
 	
@@ -219,22 +219,24 @@ public class AgentCommercial extends Agent {
 		logger.log(Logger.FINE, "Agent : "+this.getName()+", consomme :"+stock_consumption+"(-"+total+") (-"+quantity+" /sec)");
 	}
 	public void consomme(double delta){
-		consomme(delta, 1);
+		consomme(delta, Config.CONST_CONSUM);
 	}
 	/**
 	 * Mise à jour des prix
 	 */
 	public void update_price(){
-		if(satisfaction >= Config.PRICE_MAX_SATISFACTION && money >= Config.PRICE_MAX_MONEY){
-			price += 0.1;
+		if(satisfaction >= Config.PRICE_MAX_SATISFACTION && stock_consumption >= Config.UP_PRICE_CONSUM){
+			price += 0.05;
 		}
-		else if(satisfaction <= Config.PRICE_MIN_SATISFACTION && money >= Config.PRICE_MIN_MONEY){
-			price = Math.max(price - 0.1, 0.1);
+		if(price > 1 && money <= Config.PRICE_MIN_MONEY){
+			price = Math.max(price - 0.15, 0.5);
+		}else if(price < 1.0 && stock_consumption >= 2.0){
+			price += 0.1;
 		}
 	}
 	
 	public void check_lifeState(){
-		if(satisfaction < 50.0){
+		if(satisfaction < 80.0){
 			lifeState = 0;
 		}else if(satisfaction == 100 && money >= Config.INIT_MONEY*1.5){
 			lifeState = 2;
@@ -253,7 +255,7 @@ public class AgentCommercial extends Agent {
 			kill();
 		}
 		
-		if(lifeState == 2 && stock_consumption >= Config.INIT_CONSUMPTION){
+		if(lifeState == 2 && stock_consumption >= Config.INIT_CONSUMPTION*2){
 			duplication();
 		}
 		
@@ -417,7 +419,7 @@ public class AgentCommercial extends Agent {
 		//double reduction = 100.0 - satisfaction;
 		//satisfaction = reduction;
 		//satisfaction -= Math.exp( famine /5.35 - 1.0);
-		satisfaction -= Math.exp( famine /10 - 1.0);
+		satisfaction -= Math.exp( famine /5.6 - 1.0);
 	}
 	
 	//-----------------------Transactions Methodes--------------------------------
