@@ -26,7 +26,7 @@ public class Config {
 	
 	public static final double INIT_CONSUMPTION = STOCK_MAX_CONSUMPTION*1/4;
 	
-	public static final double CONST_PROD = 2;
+	public static final double CONST_PROD = 1;
 	public static final double CONST_CONSUM = 1;
 	
 	
