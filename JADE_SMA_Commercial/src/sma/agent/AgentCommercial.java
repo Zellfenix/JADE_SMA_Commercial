@@ -345,12 +345,22 @@ public class AgentCommercial extends Agent {
 	}
 	
 	private void kill(){
+		cancelAllTransaction();
 		AgentContainer c = getContainerController();
 		try {
 			AgentController ac = c.getAgent(this.getAID().getLocalName());
 			ac.kill();
 		} catch (ControllerException e) {
 			e.printStackTrace();
+		}
+	}
+	
+	public void cancelAllTransaction(){
+		for(DFAgentDescription agent : search()){
+			ACLMessage msg = new ACLMessage(ACLMessage.CANCEL);
+			msg.setContent("CANCEL");
+			msg.addReceiver(agent.getName());
+			send(msg);
 		}
 	}
 	
