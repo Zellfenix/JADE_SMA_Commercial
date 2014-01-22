@@ -36,10 +36,10 @@ public class FirstSimTest extends Agent{
 			Analyser.start();
 			AgentA1.start();
 			AgentB1.start();
-			//AgentA2.start();
-			//AgentB2.start();	
+			AgentA2.start();
+			AgentB2.start();	
 			AgentC1.start();
-			//AgentC2.start();
+			AgentC2.start();
 		} catch (StaleProxyException e) {
 			e.printStackTrace();
 		}
