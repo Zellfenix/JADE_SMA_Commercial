@@ -10,7 +10,7 @@ public class TableModelDynamique extends AbstractTableModel {
 
 	private List<Stats> stats = new ArrayList<Stats>();
  
-    private final String[] entetes = {"Name", "Status", "Satisfaction", "Satisfaction Average", "Production", "Production Stock", "Price", "Price Average", "Consuption", "Consuption Stock", "Money", "Money Average", "Life Time"};
+    private final String[] entetes = {"Name", "Status", "Satisfaction", "Satisfaction Average", "Production", "Production Stock", "Price", "Price Average", "Consuption", "Consuption Stock", "Money", "Money Average", "Life Time", "LifeState", "RunningState"};
  
     public TableModelDynamique() {
         super();
@@ -56,6 +56,10 @@ public class TableModelDynamique extends AbstractTableModel {
                 return String.format("%.2f", stats.get(rowIndex).getAverage_money());
             case 12:
                 return String.format("%.0f", stats.get(rowIndex).getLife_time());
+            case 13:
+                return String.format("%.0f", stats.get(rowIndex).getLifeState());
+            case 14:
+                return String.format("%d", stats.get(rowIndex).getRunningState());
             default:
                 return null; //Ne devrait jamais arriver
         }

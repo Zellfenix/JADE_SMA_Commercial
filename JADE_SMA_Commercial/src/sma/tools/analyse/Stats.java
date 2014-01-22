@@ -26,6 +26,9 @@ public class Stats {
 	private double average_satifaction;
 	private double average_money;
 	
+	private double lifeState;
+	private int runningState;
+	
 	public Stats(AgentCommercial agent) {
 		update(agent);
 	}
@@ -34,6 +37,8 @@ public class Stats {
 		name = agent.getName();
 		
 		life_time = agent.getLife_time();
+		lifeState = agent.getLifeState();
+		runningState = agent.getRunningState();
 		
 		production = agent.getProduction();
 		stock_production = agent.getStock_production();
@@ -117,6 +122,14 @@ public class Stats {
 	
 	public double getLife_time() {
 		return life_time;
+	}
+	
+	public double getLifeState() {
+		return lifeState;
+	}
+	
+	public int getRunningState() {
+		return runningState;
 	}
 	
 }

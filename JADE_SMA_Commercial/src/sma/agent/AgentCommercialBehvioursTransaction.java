@@ -30,7 +30,7 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 	private HashMap<AID, Double[]> price_table;
 	private int init_quantity;
 
-	private int state;
+	//private int state;
 
 	private AID min_seller;
 	private int min_quantity;
@@ -68,7 +68,7 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 			e.printStackTrace();
 		}
 		 */
-		state = 0;
+		myAgentCommercial.setRunningState(0);
 	}
 
 	@Override
@@ -78,8 +78,8 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 			return;
 		}
 
-		if(state == 4){
-			state = 0;
+		if(myAgentCommercial.getRunningState() == 4){
+			myAgentCommercial.setRunningState(0);
 		}
 
 		//Achete
@@ -118,16 +118,16 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 		//int nb_try = 0;
 
 		//Envois des CFP
-		if(state == 0){
+		if(myAgentCommercial.getRunningState() == 0){
 			price_table.clear();
 			for(DFAgentDescription seller : sellers){
 				sendCFP(seller.getName());
 			}
-			state = 1;
+			myAgentCommercial.setRunningState(1);
 		}
 
 		//Attente des reponses
-		if(price_table.size() < sellers.length && state == 1){
+		if(price_table.size() < sellers.length && myAgentCommercial.getRunningState() == 1){
 			//nb_try++;
 			//MessageTemplate mt = MessageTemplate.or( MessageTemplate.MatchPerformative( ACLMessage.PROPOSE ), MessageTemplate.MatchPerformative( ACLMessage.CONFIRM ));
 			MessageTemplate mt = MessageTemplate.MatchPerformative( ACLMessage.PROPOSE );
@@ -155,8 +155,8 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 					break;
 				}
 			}
-		}else if(state == 1){
-			state = 2;
+		}else if(myAgentCommercial.getRunningState() == 1){
+			myAgentCommercial.setRunningState(2);
 		}
 	}
 
@@ -165,8 +165,8 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 	 */
 	private void buyProduct(){
 		boolean one_is_accepted = false;
-		if(price_table.size() > 0 && state >= 2){
-			if(state == 2){
+		if(price_table.size() > 0 && myAgentCommercial.getRunningState() >= 2){
+			if(myAgentCommercial.getRunningState() == 2){
 
 				//Init variables
 				//int quantity = init_quantity;
@@ -240,17 +240,17 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 						if(min_quantity == 0){
 							sendReject_Proposal(seller);
 							System.out.println("QUANTITY = 0");
-							state = 4;
+							myAgentCommercial.setRunningState(4);
 						}else{
 							sendAccept_Proposal(min_seller, min_quantity, min_price);
 							one_is_accepted = true;
-							state = 3;
+							myAgentCommercial.setRunningState(3);
 						}
 					}
 				}
 			}
 
-			if(one_is_accepted == true || state == 3){
+			if(one_is_accepted == true || myAgentCommercial.getRunningState() == 3){
 				//Attente de la confirmation
 				int nb_reponce = 0;
 				int nb_try = 0;
@@ -265,10 +265,10 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 						case ACLMessage.CONFIRM:
 							//if(min_seller != null && min_price != Config.INFINI)
 							executeTransaction(min_quantity, min_price);
-							state = 4;
+							myAgentCommercial.setRunningState(4);
 							break;
 						case ACLMessage.CANCEL:
-							state = 4;
+							myAgentCommercial.setRunningState(4);
 							break;
 						default:
 							break;

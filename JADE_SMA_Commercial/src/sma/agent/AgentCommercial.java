@@ -58,6 +58,7 @@ public class AgentCommercial extends Agent {
 	//Etat de l'agent
 	private boolean is_at_work = true;
 	private int lifeState = 1; // 0 : survie, 1 : normal, 2 : reproduction
+	private int runningState;
 	
 	@Override
 	protected void setup() {
@@ -499,6 +500,13 @@ public class AgentCommercial extends Agent {
 	
 	public double getLifeState(){
 		return lifeState;
+	}
+	
+	public int getRunningState() {
+		return runningState;
+	}
+	public void setRunningState(int runningState) {
+		this.runningState = runningState;
 	}
 	
 	//----------------------ToString-----------------------------------------------
