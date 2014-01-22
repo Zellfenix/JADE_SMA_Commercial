@@ -236,7 +236,10 @@ public class AgentCommercial extends Agent {
 	}
 	
 	public void check_lifeState(){
-		if(satisfaction < 80.0){
+		
+		if(satisfaction < 90.0 && stock_consumption < 2.0){
+			lifeState = 3;
+		}else if(satisfaction < 90.0 || stock_consumption < 2.0){
 			lifeState = 0;
 		}else if(satisfaction == 100 && money >= Config.INIT_MONEY*1.5){
 			lifeState = 2;
@@ -251,7 +254,7 @@ public class AgentCommercial extends Agent {
 	 */
 	public void check_satisfaction(double delta){
 		if(satisfaction <= 0.0){
-			logger.log(Logger.INFO, "Agent : "+this.getName()+", is starving to death !");
+			logger.log(Logger.INFO, "Agent : "+this.getName()+", is starving to death ! lifestate : "+this.getLifeState());
 			kill();
 		}
 		

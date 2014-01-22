@@ -35,6 +35,7 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 	private AID min_seller;
 	private int min_quantity;
 	private double min_price;
+	private double quantity_for_duplication;
 
 	public AgentCommercialBehvioursTransaction(Agent a, long period) {
 		super(a, period);
@@ -106,6 +107,7 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 		return test;
 
 	}
+
 	/**
 	 * Recherche le vendeur le moins chere
 	 */
@@ -131,7 +133,8 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 			MessageTemplate mt = MessageTemplate.MatchPerformative( ACLMessage.PROPOSE );
 			ACLMessage msg = myAgent.receive(mt);
 			if(msg != null) {
-				logger.log(Logger.INFO, "ControlerAgent Receive("+myAgent.getLocalName()+"):"+msg.getContent());
+				logger.log(Logger.INFO, /*getClass().getName()+*/myAgent.getLocalName() +"Receive("+msg.getContent()+"): from :"+msg.getSender().getLocalName());
+				//logger.log(Logger.INFO, "ControlerAgent Receive("+myAgent.getLocalName()+"):"+msg.getContent());
 
 				switch(msg.getPerformative()){
 				case ACLMessage.PROPOSE:
@@ -170,22 +173,46 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 				min_price = Config.INFINI;
 				min_seller = null;
 				min_quantity = 0;
+				
 
-				if(myAgentCommercial.getLifeState() == 0 || myAgentCommercial.getLifeState() == 2){
+				if(myAgentCommercial.getLifeState() == 0 ){
 					for(AID seller : price_table.keySet()){
 						Double[] price_tmp = price_table.get(seller);
-						if(moreSuitableQuantity(price_tmp[0],price_tmp[1].intValue()) > min_quantity){ //TODO
+						if(moreSuitableQuantity(price_tmp[0],price_tmp[1].intValue()) > min_quantity || min_seller == null){ //TODO
+							min_price = price_tmp[0];
+							min_seller = seller;
+							min_quantity = moreSuitableQuantity(price_tmp[0],price_tmp[1].intValue());
+						}
+					}
+				}else if(myAgentCommercial.getLifeState() == 2){
+					double quantity;
+					quantity = Config.INFINI;
+					for(AID seller : price_table.keySet()){
+						Double[] price_tmp = price_table.get(seller);
+						quantity_for_duplication = (int) Config.INIT_CONSUMPTION*2 - myAgentCommercial.getStock_consumption();
+						if(Math.abs(quantity_for_duplication - moreSuitableQuantity(price_tmp[0],price_tmp[1].intValue())) < quantity || min_seller == null){ //TODO
+							min_price = price_tmp[0];
+							min_seller = seller;
+							min_quantity = moreSuitableQuantity(price_tmp[0],price_tmp[1].intValue());
+							quantity = Math.abs(quantity_for_duplication - moreSuitableQuantity(price_tmp[0],price_tmp[1].intValue()));
+						}
+					}
+				}else if(myAgentCommercial.getLifeState() == 1){
+					//Recherche du vendeur le moins chere dans le tableau de prix
+					for(AID seller : price_table.keySet()){
+						Double[] price_tmp = price_table.get(seller);
+
+						if((price_tmp[0] < min_price && price_tmp[1].intValue() > 0) || min_seller == null){ //TODO
 							min_price = price_tmp[0];
 							min_seller = seller;
 							min_quantity = moreSuitableQuantity(price_tmp[0],price_tmp[1].intValue());
 						}
 					}
 				}else{
-					//Recherche du vendeur le moins chere dans le tableau de prix
 					for(AID seller : price_table.keySet()){
+						min_price = -1;
 						Double[] price_tmp = price_table.get(seller);
-
-						if((price_tmp[0] < min_price && price_tmp[1].intValue() > 0) || min_seller == null){ //TODO
+						if((price_tmp[0] > min_price && price_tmp[1].intValue() > 0) || min_seller == null){ //TODO
 							min_price = price_tmp[0];
 							min_seller = seller;
 							min_quantity = moreSuitableQuantity(price_tmp[0],price_tmp[1].intValue());
@@ -232,7 +259,7 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 					MessageTemplate mt = MessageTemplate.or(MessageTemplate.MatchPerformative( ACLMessage.CONFIRM ), MessageTemplate.MatchPerformative( ACLMessage.CANCEL ));
 					ACLMessage msg = myAgent.receive(mt);
 					if(msg != null) {
-						logger.log(Logger.INFO, getClass().getName()+" Receive("+myAgent.getName()+"):"+msg);
+						logger.log(Logger.INFO, /*getClass().getName()+*/myAgent.getLocalName() +"Receive("+msg.getContent()+"): from :"+msg.getSender().getLocalName());
 						nb_reponce++;
 						switch(msg.getPerformative()){	
 						case ACLMessage.CONFIRM:
