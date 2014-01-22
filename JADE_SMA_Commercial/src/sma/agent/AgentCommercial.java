@@ -91,6 +91,7 @@ public class AgentCommercial extends Agent {
 	@Override
 	protected void takeDown() {
 		super.takeDown();
+		cancelAllTransaction();
 		deregister();
 		sendInfoToAnalyser("END");
 		logger.log(Logger.INFO, "Destroy agent :"+this); 
@@ -345,7 +346,6 @@ public class AgentCommercial extends Agent {
 	}
 	
 	private void kill(){
-		cancelAllTransaction();
 		AgentContainer c = getContainerController();
 		try {
 			AgentController ac = c.getAgent(this.getAID().getLocalName());
@@ -356,7 +356,16 @@ public class AgentCommercial extends Agent {
 	}
 	
 	public void cancelAllTransaction(){
+		logger.log(Logger.INFO, "Agent : "+this.getLocalName()+" Cancel All Transaction !");
+		//CFP
 		for(DFAgentDescription agent : search()){
+			ACLMessage msg = new ACLMessage(ACLMessage.PROPOSE);
+			msg.setContent("PROPOSE 0 999");
+			msg.addReceiver(agent.getName());
+			send(msg);
+		}
+		//Cancel
+		for(DFAgentDescription agent : search(production.toString())){
 			ACLMessage msg = new ACLMessage(ACLMessage.CANCEL);
 			msg.setContent("CANCEL");
 			msg.addReceiver(agent.getName());
