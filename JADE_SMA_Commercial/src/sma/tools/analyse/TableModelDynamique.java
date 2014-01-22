@@ -10,7 +10,7 @@ public class TableModelDynamique extends AbstractTableModel {
 
 	private List<Stats> stats = new ArrayList<Stats>();
  
-    private final String[] entetes = {"Name", "Status", "Satisfaction", "Satisfaction Average", "Production", "Production Stock", "Price", "Price Average", "Consuption", "Consuption Stock", "Money", "Money Average", "Life Time", "LifeState", "RunningState"};
+    private final String[] entetes = {"Name", "Status", "Satisfaction", "Satisfaction Average", "Production", "Production Stock", "Price", "Price Average", "Consuption", "Consuption Stock", "Money", "Money Average", "Life Time", "LifeState", "RunningState", "Transaction Init", "Transaction Confirm", "Transaction Cancel"};
  
     public TableModelDynamique() {
         super();
@@ -60,8 +60,14 @@ public class TableModelDynamique extends AbstractTableModel {
                 return String.format("%.0f", stats.get(rowIndex).getLifeState());
             case 14:
                 return String.format("%d", stats.get(rowIndex).getRunningState());
+            case 15:
+                return String.format("%d", stats.get(rowIndex).getTransactionInit());
+            case 16:
+                return String.format("%d", stats.get(rowIndex).getTransactionConfirm());
+            case 17:
+                return String.format("%d", stats.get(rowIndex).getTransactionCancel());
             default:
-                return null; //Ne devrait jamais arriver
+                return ""; //Ne devrait jamais arriver
         }
     }
  

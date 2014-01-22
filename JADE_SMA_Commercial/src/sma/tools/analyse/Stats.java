@@ -29,6 +29,10 @@ public class Stats {
 	private double lifeState;
 	private int runningState;
 	
+	private int transactionConfirm;
+	private int transactionCancel;
+	private int transactionInit;
+	
 	public Stats(AgentCommercial agent) {
 		update(agent);
 	}
@@ -37,8 +41,13 @@ public class Stats {
 		name = agent.getName();
 		
 		life_time = agent.getLife_time();
+		
 		lifeState = agent.getLifeState();
 		runningState = agent.getRunningState();
+		
+		transactionCancel = agent.getTransactionCancel();
+		transactionConfirm = agent.getTransactionConfirm();
+		transactionInit = agent.getTransactionInit();
 		
 		production = agent.getProduction();
 		stock_production = agent.getStock_production();
@@ -130,6 +139,18 @@ public class Stats {
 	
 	public int getRunningState() {
 		return runningState;
+	}
+	
+	public int getTransactionCancel() {
+		return transactionCancel;
+	}
+	
+	public int getTransactionConfirm() {
+		return transactionConfirm;
+	}
+	
+	public int getTransactionInit() {
+		return transactionInit;
 	}
 	
 }

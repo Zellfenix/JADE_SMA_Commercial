@@ -124,6 +124,7 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 				sendCFP(seller.getName());
 			}
 			myAgentCommercial.setRunningState(1);
+			myAgentCommercial.addTransactionInit();
 		}
 
 		//Attente des reponses
@@ -266,9 +267,11 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 							//if(min_seller != null && min_price != Config.INFINI)
 							executeTransaction(min_quantity, min_price);
 							myAgentCommercial.setRunningState(4);
+							myAgentCommercial.addTransactionConfirm();
 							break;
 						case ACLMessage.CANCEL:
 							myAgentCommercial.setRunningState(4);
+							myAgentCommercial.addTransactionCancel();
 							break;
 						default:
 							break;

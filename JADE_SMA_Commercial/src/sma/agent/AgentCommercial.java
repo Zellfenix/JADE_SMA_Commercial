@@ -59,6 +59,9 @@ public class AgentCommercial extends Agent {
 	private boolean is_at_work = true;
 	private int lifeState = 1; // 0 : survie, 1 : normal, 2 : reproduction
 	private int runningState;
+	private int transactionConfirm;
+	private int transactionCancel;
+	private int transactionInit;
 	
 	@Override
 	protected void setup() {
@@ -507,6 +510,28 @@ public class AgentCommercial extends Agent {
 	}
 	public void setRunningState(int runningState) {
 		this.runningState = runningState;
+	}
+
+	
+	public int getTransactionConfirm() {
+		return transactionConfirm;
+	}
+	public void addTransactionConfirm() {
+		transactionConfirm++;
+	}
+	
+	public int getTransactionCancel() {
+		return transactionCancel;
+	}
+	public void addTransactionCancel() {
+		transactionCancel++;
+	}
+	
+	public int getTransactionInit() {
+		return transactionInit;
+	}
+	public void addTransactionInit() {
+		transactionInit++;
 	}
 	
 	//----------------------ToString-----------------------------------------------
