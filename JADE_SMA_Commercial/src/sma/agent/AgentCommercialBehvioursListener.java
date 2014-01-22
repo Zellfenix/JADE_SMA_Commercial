@@ -100,7 +100,8 @@ class AgentCommercialBehvioursListenerModule extends Behaviour {
 			//MessageTemplate mt = MessageTemplate.MatchSender(sender);
 			ACLMessage msg = myAgent.receive(mt);
 			if(msg != null) {
-				logger.log(Logger.INFO, "ControlerAgent Receive("+myAgent.getLocalName()+"):"+msg.getContent());
+				logger.log(Logger.INFO, /*getClass().getName()+*/myAgent.getLocalName() +"Receive("+msg.getContent()+"): from :"+msg.getSender().getLocalName());
+				//logger.log(Logger.INFO, "ControlerAgent Receive("+myAgent.getLocalName()+"):"+msg.getContent());
 				
 				switch(msg.getPerformative()){
 					case ACLMessage.CFP:
@@ -172,7 +173,8 @@ class AgentCommercialBehvioursListenerModule extends Behaviour {
 				reply.setPerformative(ACLMessage.CONFIRM);
 				reply.setContent("CONFIRM "+quantityR+" "+priceSend);
 				myAgent.send(reply);
-				logger.log(Level.INFO, myAgent.getLocalName()+" :Transaction accepted! Send Confirm!");
+				logger.log(Logger.INFO, /*getClass().getName()+*/myAgent.getLocalName() +"Receive(Transaction accepted! Send Confirm!): from :"+msg.getSender().getLocalName());
+				//logger.log(Level.INFO, myAgent.getLocalName()+" :Transaction accepted! Send Confirm!");
 				
 				//Execute transaction
 				myAgentCommercial.sell(quantityR, priceSend);
@@ -180,7 +182,8 @@ class AgentCommercialBehvioursListenerModule extends Behaviour {
 				ACLMessage reply = msg.createReply();
 				reply.setPerformative(ACLMessage.CANCEL);
 				myAgent.send(reply);
-				logger.log(Level.INFO, myAgent.getLocalName()+" :Transaction refused! Not enough produc!t");
+				logger.log(Logger.INFO, myAgent.getLocalName() +"Receive(Transaction refused! Not enough product): from :"+msg.getSender().getLocalName());
+				//logger.log(Level.INFO, myAgent.getLocalName()+" :Transaction refused! Not enough produc!t");
 			}
 /*
 	}else{

@@ -18,10 +18,16 @@ public class Config {
 	public static final double INFINI = 99999999;
 	
 	//Variable pour modification des prix
-	public static final double PRICE_MIN_SATISFACTION = 90;
+	public static final double PRICE_MIN_SATISFACTION = 60;
 	public static final double PRICE_MAX_SATISFACTION = 100;
 	public static final double PRICE_MIN_MONEY = 50;
 	public static final double PRICE_MAX_MONEY = 110;
+	public static final double UP_PRICE_CONSUM = 20;
+	
+	public static final double INIT_CONSUMPTION = STOCK_MAX_CONSUMPTION*1/4;
+	
+	public static final double CONST_PROD = 2;
+	public static final double CONST_CONSUM = 1;
 	
 	
 	/**
@@ -29,6 +35,7 @@ public class Config {
 	 * Voir methode: private void reduceSatifaction(float delta)
 	 */
 	public static final double CONST_REDUCE_SATIFACTION = 1;
+	
 	
 	//System.out.println(System.getProperty("user.home"));
 }

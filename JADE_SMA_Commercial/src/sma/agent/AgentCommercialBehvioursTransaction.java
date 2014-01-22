@@ -29,12 +29,13 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 	//Regroupe les prix de chaque agent
 	private HashMap<AID, Double[]> price_table;
 	private int init_quantity;
-	
+
 	private int state;
 
 	private AID min_seller;
 	private int min_quantity;
 	private double min_price;
+	private double quantity_for_duplication;
 
 	public AgentCommercialBehvioursTransaction(Agent a, long period) {
 		super(a, period);
@@ -46,7 +47,7 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 		this.init_quantity = 1;
 
 		logger.log(Logger.CONFIG, "Create AgentCommercialBehvioursTransaction");
-		
+
 	}
 
 	@Override
@@ -59,14 +60,14 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 		//Behaviour de recherche d'un vendeur
 		//myAgent.addBehaviour(new PriceResearch(myAgent, 5000));
 		//myAgent.addBehaviour(new PriceResearch(myAgent, 1000));
-/*
+		/*
 		try {
 			Thread.sleep(1000);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		*/
+		 */
 		state = 0;
 	}
 
@@ -80,7 +81,7 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 		if(state == 4){
 			state = 0;
 		}
-		
+
 		//Achete
 		pricesResearch();
 		buyProduct();
@@ -106,6 +107,7 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 		return test;
 
 	}
+
 	/**
 	 * Recherche le vendeur le moins chere
 	 */
@@ -114,7 +116,7 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 		DFAgentDescription[] sellers = myAgentCommercial.search();
 		//int nb_reponce = 0;
 		//int nb_try = 0;
-		
+
 		//Envois des CFP
 		if(state == 0){
 			price_table.clear();
@@ -123,7 +125,7 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 			}
 			state = 1;
 		}
-		
+
 		//Attente des reponses
 		if(price_table.size() < sellers.length && state == 1){
 			//nb_try++;
@@ -131,7 +133,8 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 			MessageTemplate mt = MessageTemplate.MatchPerformative( ACLMessage.PROPOSE );
 			ACLMessage msg = myAgent.receive(mt);
 			if(msg != null) {
-				logger.log(Logger.INFO, "ControlerAgent Receive("+myAgent.getLocalName()+"):"+msg.getContent());
+				logger.log(Logger.INFO, /*getClass().getName()+*/myAgent.getLocalName() +"Receive("+msg.getContent()+"): from :"+msg.getSender().getLocalName());
+				//logger.log(Logger.INFO, "ControlerAgent Receive("+myAgent.getLocalName()+"):"+msg.getContent());
 
 				switch(msg.getPerformative()){
 				case ACLMessage.PROPOSE:
@@ -164,21 +167,56 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 		boolean one_is_accepted = false;
 		if(price_table.size() > 0 && state >= 2){
 			if(state == 2){
-					
+
 				//Init variables
 				//int quantity = init_quantity;
 				min_price = Config.INFINI;
 				min_seller = null;
 				min_quantity = 0;
-	
-				//Recherche du vendeur le moins chere dans le tableau de prix
-				for(AID seller : price_table.keySet()){
-					Double[] price_tmp = price_table.get(seller);
-	
-					if((price_tmp[0] < min_price && price_tmp[1].intValue() > 0) || min_seller == null){ //TODO
-						min_price = price_tmp[0];
-						min_seller = seller;
-						min_quantity = moreSuitableQuantity(price_tmp[0],price_tmp[1].intValue());
+				
+
+				if(myAgentCommercial.getLifeState() == 0 ){
+					for(AID seller : price_table.keySet()){
+						Double[] price_tmp = price_table.get(seller);
+						if(moreSuitableQuantity(price_tmp[0],price_tmp[1].intValue()) > min_quantity || min_seller == null){ //TODO
+							min_price = price_tmp[0];
+							min_seller = seller;
+							min_quantity = moreSuitableQuantity(price_tmp[0],price_tmp[1].intValue());
+						}
+					}
+				}else if(myAgentCommercial.getLifeState() == 2){
+					double quantity;
+					quantity = Config.INFINI;
+					for(AID seller : price_table.keySet()){
+						Double[] price_tmp = price_table.get(seller);
+						quantity_for_duplication = (int) Config.INIT_CONSUMPTION*2 - myAgentCommercial.getStock_consumption();
+						if(Math.abs(quantity_for_duplication - moreSuitableQuantity(price_tmp[0],price_tmp[1].intValue())) < quantity || min_seller == null){ //TODO
+							min_price = price_tmp[0];
+							min_seller = seller;
+							min_quantity = moreSuitableQuantity(price_tmp[0],price_tmp[1].intValue());
+							quantity = Math.abs(quantity_for_duplication - moreSuitableQuantity(price_tmp[0],price_tmp[1].intValue()));
+						}
+					}
+				}else if(myAgentCommercial.getLifeState() == 1){
+					//Recherche du vendeur le moins chere dans le tableau de prix
+					for(AID seller : price_table.keySet()){
+						Double[] price_tmp = price_table.get(seller);
+
+						if((price_tmp[0] < min_price && price_tmp[1].intValue() > 0) || min_seller == null){ //TODO
+							min_price = price_tmp[0];
+							min_seller = seller;
+							min_quantity = moreSuitableQuantity(price_tmp[0],price_tmp[1].intValue());
+						}
+					}
+				}else{
+					for(AID seller : price_table.keySet()){
+						min_price = -1;
+						Double[] price_tmp = price_table.get(seller);
+						if((price_tmp[0] > min_price && price_tmp[1].intValue() > 0) || min_seller == null){ //TODO
+							min_price = price_tmp[0];
+							min_seller = seller;
+							min_quantity = moreSuitableQuantity(price_tmp[0],price_tmp[1].intValue());
+						}
 					}
 				}
 				/*	
@@ -192,9 +230,9 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 					return;
 				}
 				 */	
-	
+
 				//Envois de l'acceptation
-			
+
 				for(AID seller : price_table.keySet()){
 					if(seller.equals(min_seller) == false){
 						sendReject_Proposal(seller);
@@ -221,12 +259,12 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 					MessageTemplate mt = MessageTemplate.or(MessageTemplate.MatchPerformative( ACLMessage.CONFIRM ), MessageTemplate.MatchPerformative( ACLMessage.CANCEL ));
 					ACLMessage msg = myAgent.receive(mt);
 					if(msg != null) {
-						logger.log(Logger.INFO, getClass().getName()+" Receive("+myAgent.getName()+"):"+msg);
+						logger.log(Logger.INFO, /*getClass().getName()+*/myAgent.getLocalName() +"Receive("+msg.getContent()+"): from :"+msg.getSender().getLocalName());
 						nb_reponce++;
 						switch(msg.getPerformative()){	
 						case ACLMessage.CONFIRM:
 							//if(min_seller != null && min_price != Config.INFINI)
-								executeTransaction(min_quantity, min_price);
+							executeTransaction(min_quantity, min_price);
 							state = 4;
 							break;
 						case ACLMessage.CANCEL:
@@ -256,7 +294,7 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 		msg.setContent("ACCEPT_PROPOSAL "+quantity);
 		msg.addReceiver(aid);
 		myAgent.send(msg);
-		
+
 	}
 
 	private void sendReject_Proposal(AID aid){
@@ -264,7 +302,7 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 		msg.setContent("REJECT_PROPOSAL");
 		msg.addReceiver(aid);
 		myAgent.send(msg);
-		
+
 	}
 
 	private void executeTransaction(int quantity, double price) {

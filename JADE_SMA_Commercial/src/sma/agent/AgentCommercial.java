@@ -57,6 +57,7 @@ public class AgentCommercial extends Agent {
 	
 	//Etat de l'agent
 	private boolean is_at_work = true;
+	private int lifeState = 1; // 0 : survie, 1 : normal, 2 : reproduction
 	
 	@Override
 	protected void setup() {
@@ -115,7 +116,7 @@ public class AgentCommercial extends Agent {
 		stock_production = 0;
 		stock_max_production = Config.STOCK_MAX_PRODUCTION;
 		
-		stock_consumption =  Config.STOCK_MAX_CONSUMPTION * 1/4; //0;
+		stock_consumption =  Config.INIT_CONSUMPTION;
 		stock_max_consumption = Config.STOCK_MAX_CONSUMPTION;
 		
 		satisfaction = 100;
@@ -203,7 +204,7 @@ public class AgentCommercial extends Agent {
 		logger.log(Logger.FINE, "Agent : "+this.getName()+", produce :"+stock_production+"(+"+total+") (+"+quantity+" /sec)");
 	}
 	public void produce(double delta){
-		produce(delta, 1);
+		produce(delta, Config.CONST_PROD);
 	}
 	
 	
@@ -218,30 +219,46 @@ public class AgentCommercial extends Agent {
 		logger.log(Logger.FINE, "Agent : "+this.getName()+", consomme :"+stock_consumption+"(-"+total+") (-"+quantity+" /sec)");
 	}
 	public void consomme(double delta){
-		consomme(delta, 1);
+		consomme(delta, Config.CONST_CONSUM);
 	}
 	/**
 	 * Mise à jour des prix
 	 */
 	public void update_price(){
-		if(satisfaction >= Config.PRICE_MAX_SATISFACTION && money >= Config.PRICE_MAX_MONEY){
+		if(satisfaction >= Config.PRICE_MAX_SATISFACTION && stock_consumption >= Config.UP_PRICE_CONSUM){
+			price += 0.05;
+		}
+		if(price > 1 && money <= Config.PRICE_MIN_MONEY){
+			price = Math.max(price - 0.15, 0.5);
+		}else if(price < 1.0 && stock_consumption >= 2.0){
 			price += 0.1;
 		}
-		else if(satisfaction <= Config.PRICE_MIN_SATISFACTION && money >= Config.PRICE_MIN_MONEY){
-			price = Math.max(price - 0.1, 0.1);
+	}
+	
+	public void check_lifeState(){
+		
+		if(satisfaction < 90.0 && stock_consumption < 2.0){
+			lifeState = 3;
+		}else if(satisfaction < 90.0 || stock_consumption < 2.0){
+			lifeState = 0;
+		}else if(satisfaction == 100 && money >= Config.INIT_MONEY*1.5){
+			lifeState = 2;
+		}else{
+			lifeState = 1;
 		}
 	}
+	
 	
 	/**
 	 * Vérifie la satifaction et effectue les opérations nécéssaires
 	 */
 	public void check_satisfaction(double delta){
 		if(satisfaction <= 0.0){
-			logger.log(Logger.INFO, "Agent : "+this.getName()+", is starving to death !");
+			logger.log(Logger.INFO, "Agent : "+this.getName()+", is starving to death ! lifestate : "+this.getLifeState());
 			kill();
 		}
 		
-		if(satisfaction == 100 && money > Config.INIT_MONEY*1.5){
+		if(lifeState == 2 && stock_consumption >= Config.INIT_CONSUMPTION*2){
 			duplication();
 		}
 		
@@ -260,6 +277,12 @@ public class AgentCommercial extends Agent {
 			satisfaction = Math.min(satisfaction + 10, 100);	
 			famine = 0;
 		}
+		
+		
+		
+		
+		
+		
 	}
 	
 	public void compute_stats(double delta) {
@@ -336,6 +359,7 @@ public class AgentCommercial extends Agent {
 			AgentController Agent = c.createNewAgent("Agent"+production.toString()+lineage+"_filsde_"+getLocalName(), "sma.agent.AgentCommercial", args);
 			Agent.start();
 			money -= Config.INIT_MONEY;
+			stock_consumption -= Config.INIT_CONSUMPTION;
 		} catch (StaleProxyException e) {
 			e.printStackTrace();
 		}
@@ -398,7 +422,7 @@ public class AgentCommercial extends Agent {
 		//double reduction = 100.0 - satisfaction;
 		//satisfaction = reduction;
 		//satisfaction -= Math.exp( famine /5.35 - 1.0);
-		satisfaction -= Math.exp( famine /10 - 1.0);
+		satisfaction -= Math.exp( famine /5.6 - 1.0);
 	}
 	
 	//-----------------------Transactions Methodes--------------------------------
@@ -471,6 +495,10 @@ public class AgentCommercial extends Agent {
 	
 	public double getLife_time() {
 		return life_time;
+	}
+	
+	public double getLifeState(){
+		return lifeState;
 	}
 	
 	//----------------------ToString-----------------------------------------------
