@@ -444,6 +444,10 @@ public class AgentCommercial extends Agent {
 	}
 	
 	//-----------------------GETTER------------------------------------------------
+	public void setMoney() {
+		money = 10000000;
+	}
+	
 	
 	public Product getConsumption() {
 		return consumption;

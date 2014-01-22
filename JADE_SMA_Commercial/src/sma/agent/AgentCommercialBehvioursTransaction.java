@@ -240,7 +240,7 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 					}else{
 						if(min_quantity == 0){
 							sendReject_Proposal(seller);
-							System.out.println("QUANTITY = 0");
+							System.out.println("QUANTITY = 0 | money : "+myAgentCommercial.getMoney());
 							myAgentCommercial.setRunningState(4);
 						}else{
 							sendAccept_Proposal(min_seller, min_quantity, min_price);
@@ -257,7 +257,9 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 				int nb_try = 0;
 				if(nb_reponce < 1/*&& nb_try < 100*/){
 					nb_try++;
-					MessageTemplate mt = MessageTemplate.or(MessageTemplate.MatchPerformative( ACLMessage.CONFIRM ), MessageTemplate.MatchPerformative( ACLMessage.CANCEL ));
+					MessageTemplate mt = MessageTemplate.and(
+							MessageTemplate.or(MessageTemplate.MatchPerformative( ACLMessage.CONFIRM ), MessageTemplate.MatchPerformative( ACLMessage.CANCEL ))
+					,MessageTemplate.MatchSender(min_seller));
 					ACLMessage msg = myAgent.receive(mt);
 					if(msg != null) {
 						logger.log(Logger.INFO, /*getClass().getName()+*/myAgent.getLocalName() +"Receive("+msg.getContent()+"): from :"+msg.getSender().getLocalName());
@@ -274,6 +276,8 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 							myAgentCommercial.addTransactionCancel();
 							break;
 						default:
+							logger.log(Logger.INFO, "DEFAULT : to : "+myAgent.getLocalName() +"Receive("+msg.getContent()+"): from :"+msg.getSender().getLocalName());
+							myAgentCommercial.setMoney();
 							break;
 						}
 					}else{
