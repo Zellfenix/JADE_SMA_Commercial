@@ -12,6 +12,7 @@ import jade.lang.acl.MessageTemplate;
 import jade.util.Logger;
 
 import java.util.HashMap;
+import java.util.Random;
 
 import sma.tools.Config;
 
@@ -183,6 +184,12 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 							min_price = price_tmp[0];
 							min_seller = seller;
 							min_quantity = moreSuitableQuantity(price_tmp[0],price_tmp[1].intValue());
+							if(min_quantity > 1){
+								Random r = new Random();
+								if(r.nextBoolean() == true){
+									break;
+								}
+							}
 						}
 					}
 				}else if(myAgentCommercial.getLifeState() == 2){

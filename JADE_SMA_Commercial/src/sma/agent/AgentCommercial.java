@@ -364,12 +364,14 @@ public class AgentCommercial extends Agent {
 			msg.addReceiver(agent.getName());
 			send(msg);
 		}
-		//Cancel
-		for(DFAgentDescription agent : search(production.toString())){
-			ACLMessage msg = new ACLMessage(ACLMessage.CANCEL);
-			msg.setContent("CANCEL");
-			msg.addReceiver(agent.getName());
-			send(msg);
+		for(Product p : Product.values()){
+			//Cancel
+			for(DFAgentDescription agent : search(p.toString())){
+				ACLMessage msg = new ACLMessage(ACLMessage.CANCEL);
+				msg.setContent("CANCEL");
+				msg.addReceiver(agent.getName());
+				send(msg);
+			}
 		}
 	}
 	
