@@ -78,7 +78,7 @@ public class AgentCommercial extends Agent {
 		register();
 		
 		//Message du creation de l'agent
-		logger.log(Logger.INFO, "Create Agent : "+this); 
+		logger.log(Logger.INFO, "Create Agent : "+this, this); 
 		
 		//Ajout des classe Behviours
 		addBehaviour(new AgentCommercialBehviours(this, Config.TICKER_DELAY));
@@ -94,7 +94,7 @@ public class AgentCommercial extends Agent {
 		cancelAllTransaction();
 		deregister();
 		sendInfoToAnalyser("END");
-		logger.log(Logger.INFO, "Destroy agent :"+this); 
+		logger.log(Logger.INFO, "Destroy agent :"+this, this); 
 	}
 	
 	/**
@@ -173,7 +173,7 @@ public class AgentCommercial extends Agent {
 		dfd.addServices(sd);
 		try {
 			DFService.register(this, dfd);
-			logger.log(Logger.INFO, "Agent is register!"); 
+			logger.log(Logger.INFO, "Agent is register!", this); 
 		}
 		catch (FIPAException fe) {
 			fe.printStackTrace();
@@ -187,7 +187,7 @@ public class AgentCommercial extends Agent {
 		// Deregister from the yellow pages
 		try {
 			DFService.deregister(this);
-			logger.log(Logger.INFO, "Agent is deregister!"); 
+			logger.log(Logger.INFO, "Agent is deregister!", this); 
 		}catch(FIPAException fe) {
 			fe.printStackTrace();
 		}
@@ -206,7 +206,7 @@ public class AgentCommercial extends Agent {
 			//Augmentation de la satifaction
 		}
 		
-		logger.log(Logger.FINE, "Agent : "+this.getName()+", produce :"+stock_production+"(+"+total+") (+"+quantity+" /sec)");
+		logger.log(Logger.FINE, "Agent : "+this.getName()+", produce :"+stock_production+"(+"+total+") (+"+quantity+" /sec)", this);
 	}
 	public void produce(double delta){
 		produce(delta, Config.CONST_PROD);
@@ -221,7 +221,7 @@ public class AgentCommercial extends Agent {
 		double total = quantity * delta;
 		removeStock_Consomme(total);
 		
-		logger.log(Logger.FINE, "Agent : "+this.getName()+", consomme :"+stock_consumption+"(-"+total+") (-"+quantity+" /sec)");
+		logger.log(Logger.FINE, "Agent : "+this.getName()+", consomme :"+stock_consumption+"(-"+total+") (-"+quantity+" /sec)", this);
 	}
 	public void consomme(double delta){
 		consomme(delta, Config.CONST_CONSUM);
@@ -259,7 +259,7 @@ public class AgentCommercial extends Agent {
 	 */
 	public void check_satisfaction(double delta){
 		if(satisfaction <= 0.0){
-			logger.log(Logger.INFO, "Agent : "+this.getName()+", is starving to death ! lifestate : "+this.getLifeState());
+			logger.log(Logger.INFO, "Agent : "+this.getName()+", is starving to death ! lifestate : "+this.getLifeState(), this);
 			kill();
 		}
 		
@@ -277,7 +277,7 @@ public class AgentCommercial extends Agent {
 		if(stock_consumption <= 0){
 			famine += delta;// * 1;
 			reduceSatifaction(delta);
-			logger.log(Logger.FINE, "Agent : "+this.getName()+", Famine increased to "+famine+" !");
+			logger.log(Logger.FINE, "Agent : "+this.getName()+", Famine increased to "+famine+" !", this);
 		}else{			
 			satisfaction = Math.min(satisfaction + 10, 100);	
 			famine = 0;
@@ -356,7 +356,7 @@ public class AgentCommercial extends Agent {
 	}
 	
 	public void cancelAllTransaction(){
-		logger.log(Logger.INFO, "Agent : "+this.getLocalName()+" Cancel All Transaction !");
+		logger.log(Logger.INFO, "Agent : "+this.getLocalName()+" Cancel All Transaction !", this);
 		//CFP
 		for(DFAgentDescription agent : search()){
 			ACLMessage msg = new ACLMessage(ACLMessage.PROPOSE);
@@ -453,13 +453,13 @@ public class AgentCommercial extends Agent {
 	//-----------------------Transactions Methodes--------------------------------
 	
 	public synchronized void sell(int quantity, double price) {
-		logger.log(Level.INFO, "Sell "+quantity+" for "+price+" $");
+		logger.log(Level.INFO, "Sell "+quantity+" for "+price+" $", this);
 		stock_production -= quantity;
 		money += price * quantity;
 	}
 
 	public synchronized void buy(int quantity, double price) {
-		logger.log(Level.INFO, "Buy "+quantity+" for "+price+" $");
+		logger.log(Level.INFO, "Buy "+quantity+" for "+price+" $", this);
 		stock_consumption += quantity;
 		money -= price * quantity;
 	}
@@ -563,14 +563,7 @@ public class AgentCommercial extends Agent {
 	
 	@Override
 	public String toString() {
-		return "AgentCommercial [production=" + production
-				+ ", stock_production=" + stock_production
-				+ ", stock_max_production=" + stock_max_production + ", price="
-				+ price + ", consumption=" + consumption
-				+ ", stock_consumption=" + stock_consumption
-				+ ", stock_max_consumption=" + stock_max_consumption
-				+ ", money=" + money + ", satisfaction=" + satisfaction
-				+ ", famine=" + famine + "]";
+		return getLocalName();
 	}
 	
 }

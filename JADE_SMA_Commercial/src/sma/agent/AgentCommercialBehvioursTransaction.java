@@ -13,6 +13,7 @@ import jade.util.Logger;
 
 import java.util.HashMap;
 import java.util.Random;
+import java.util.logging.Level;
 
 import sma.tools.Config;
 
@@ -47,7 +48,7 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 		//this.init_quantity = 10;
 		this.init_quantity = 1;
 
-		logger.log(Logger.CONFIG, "Create AgentCommercialBehvioursTransaction");
+		logger.log(Logger.CONFIG, "Create AgentCommercialBehvioursTransaction", this);
 
 	}
 
@@ -55,7 +56,7 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 	public void onStart() {
 		super.onStart();
 		//Message test de log
-		logger.log(Logger.INFO, "Entrée dans onStart.");
+		logger.log(Logger.INFO, "Entrée dans onStart.", this);
 		this.myAgentCommercial = (AgentCommercial) this.myAgent;
 
 		//Behaviour de recherche d'un vendeur
@@ -92,7 +93,7 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 	@Override
 	public int onEnd() {
 		//Message test de log
-		logger.log(Logger.INFO, "End of transaction!"); 	
+		logger.log(Logger.INFO, "End of transaction!", this); 	
 		return super.onEnd();
 	}
 
@@ -135,9 +136,10 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 			MessageTemplate mt = MessageTemplate.MatchPerformative( ACLMessage.PROPOSE );
 			ACLMessage msg = myAgent.receive(mt);
 			if(msg != null) {
-				logger.log(Logger.INFO, /*getClass().getName()+*/myAgent.getLocalName() +"Receive("+msg.getContent()+"): from :"+msg.getSender().getLocalName());
+				//logger.log(Logger.INFO, /*getClass().getName()+*/myAgent.getLocalName() +" Receive("+msg.getContent()+"): from :"+msg.getSender().getLocalName(), this);
 				//logger.log(Logger.INFO, "ControlerAgent Receive("+myAgent.getLocalName()+"):"+msg.getContent());
-
+				logger.log(Logger.INFO, "Receive("+msg.getContent()+"): from :"+msg.getSender().getLocalName(), this);
+				
 				switch(msg.getPerformative()){
 				case ACLMessage.PROPOSE:
 					String[] propose = msg.getContent().split(" ");
@@ -147,7 +149,8 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 						Double[] tmp = {price, (double) quantity};
 						price_table.put(msg.getSender(), tmp);
 						//nb_reponce++;
-						System.out.println("Taille price_table : "+price_table.size());
+						//System.out.println("Taille price_table : "+price_table.size());
+						logger.log(Level.FINE, "Taille price_table : "+price_table.size(), this);
 					} catch (NumberFormatException e) {
 						e.printStackTrace();
 						return;
@@ -247,7 +250,8 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 					}else{
 						if(min_quantity == 0){
 							sendReject_Proposal(seller);
-							System.out.println("QUANTITY = 0 | money : "+myAgentCommercial.getMoney());
+							logger.log(Level.INFO, "QUANTITY = 0 | money : "+myAgentCommercial.getMoney(), this);
+							//System.out.println("QUANTITY = 0 | money : "+myAgentCommercial.getMoney());
 							myAgentCommercial.setRunningState(4);
 						}else{
 							sendAccept_Proposal(min_seller, min_quantity, min_price);
@@ -270,7 +274,10 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 					,MessageTemplate.MatchSender(min_seller));
 					ACLMessage msg = myAgent.receive(mt);
 					if(msg != null) {
-						logger.log(Logger.INFO, /*getClass().getName()+*/myAgent.getLocalName() +"Receive("+msg.getContent()+"): from :"+msg.getSender().getLocalName());
+						
+						//logger.log(Logger.INFO, /*getClass().getName()+*/myAgent.getLocalName() +"Receive("+msg.getContent()+"): from :"+msg.getSender().getLocalName(), this);
+						logger.log(Logger.INFO, "Receive("+msg.getContent()+"): from :"+msg.getSender().getLocalName(), this);
+						
 						nb_reponce++;
 						switch(msg.getPerformative()){	
 						case ACLMessage.CONFIRM:
@@ -284,7 +291,7 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 							myAgentCommercial.addTransactionCancel();
 							break;
 						default:
-							logger.log(Logger.INFO, "DEFAULT : to : "+myAgent.getLocalName() +"Receive("+msg.getContent()+"): from :"+msg.getSender().getLocalName());
+							logger.log(Logger.INFO, "DEFAULT : to : "+myAgent.getLocalName() +"Receive("+msg.getContent()+"): from :"+msg.getSender().getLocalName(), this);
 							myAgentCommercial.setMoney();
 							break;
 						}
@@ -338,4 +345,8 @@ public class AgentCommercialBehvioursTransaction extends TickerBehaviour {
 		}
 	}
 
+	@Override
+	public String toString() {
+		return myAgent.getLocalName();
+	}
 }

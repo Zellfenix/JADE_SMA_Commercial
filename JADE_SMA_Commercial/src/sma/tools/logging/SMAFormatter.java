@@ -10,6 +10,8 @@ import java.util.Date;
 import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
 
+import sma.tools.Config;
+
 /**
  * @author Jérémy
  *
@@ -25,21 +27,28 @@ public class SMAFormatter extends Formatter {
 	@Override
 	public String format(LogRecord record) {
 		StringBuffer buf = new StringBuffer(180);
+
+		Object[] param = record.getParameters();
 		
-		if (dateFormat == null)
-			dateFormat = DateFormat.getDateTimeInstance();
+		if(Config.DEBUG_LOG){
+			if (dateFormat == null)
+				dateFormat = DateFormat.getDateTimeInstance();
+			
+			buf.append(record.getLevel());
+			buf.append(":");
+			buf.append(dateFormat.format(new Date(record.getMillis())));
+			buf.append(' ');
+			buf.append(record.getSourceClassName());
+			buf.append(' ');
+			buf.append(record.getSourceMethodName());
+			buf.append(lineSep);
+		}
 		
-		buf.append(record.getLevel());
-		buf.append(":");
-		buf.append(dateFormat.format(new Date(record.getMillis())));
-		buf.append(' ');
-		buf.append(record.getSourceClassName());
-		buf.append(' ');
-		buf.append(record.getSourceMethodName());
-		buf.append(lineSep);
-		
-		buf.append(formatMessage(record));
- 
+		if(param != null && param[0] != null)
+			buf.append("\t"+"("+record.getLevel().toString().charAt(0)+")"+param[0].toString()+" : "+formatMessage(record));
+		else
+			buf.append("\t"+"("+record.getLevel().toString().charAt(0)+")"+formatMessage(record));
+			
 		buf.append(lineSep);
 		
 		Throwable throwable = record.getThrown();

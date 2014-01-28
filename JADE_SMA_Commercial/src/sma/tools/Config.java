@@ -9,7 +9,9 @@ package sma.tools;
  *
  */
 public class Config {
-
+	
+	public static final boolean DEBUG_LOG = true;
+	
 	public static final int TICKER_DELAY = 1000;
 	public static final int STOCK_MAX_PRODUCTION = 50;
 	public static final int STOCK_MAX_CONSUMPTION = 50;
@@ -35,7 +37,6 @@ public class Config {
 	 * Voir methode: private void reduceSatifaction(float delta)
 	 */
 	public static final double CONST_REDUCE_SATIFACTION = 1;
-	
 	
 	//System.out.println(System.getProperty("user.home"));
 }

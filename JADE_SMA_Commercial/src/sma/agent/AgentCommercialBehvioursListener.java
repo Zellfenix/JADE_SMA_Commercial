@@ -38,7 +38,7 @@ public class AgentCommercialBehvioursListener extends Behaviour {
 		ACLMessage msg = myAgent.receive(mt);
 		if(msg != null) {
 			if(listener.containsKey(msg.getSender().toString()) == false){
-				logger.log(Logger.INFO, "Create ListerModule for :"+msg.getSender());
+				logger.log(Logger.INFO, "Create ListerModule for :"+msg.getSender(), this);
 				
 				AgentCommercialBehvioursListenerModule listener_agent = new AgentCommercialBehvioursListenerModule(msg.getSender());
 				myAgent.addBehaviour(listener_agent);
@@ -76,14 +76,14 @@ class AgentCommercialBehvioursListenerModule extends Behaviour {
 		this.sender = sender;
 		this.logger = Logger.getMyLogger(this.getClass().getName());
 		
-		logger.log(Logger.CONFIG, "Create AgentCommercialBehvioursListener for : "+sender);
+		logger.log(Logger.CONFIG, "Create AgentCommercialBehvioursListener for : "+sender, this);
 	}
 
 	@Override
 	public void onStart() {
 		super.onStart();
 		//Message test de log
-		logger.log(Logger.INFO, "Entrée dans onStart.");
+		logger.log(Logger.INFO, "Entrée dans onStart.", this);
 		this.myAgentCommercial = (AgentCommercial) this.myAgent;
 	}
 
@@ -100,8 +100,10 @@ class AgentCommercialBehvioursListenerModule extends Behaviour {
 			//MessageTemplate mt = MessageTemplate.MatchSender(sender);
 			ACLMessage msg = myAgent.receive(mt);
 			if(msg != null) {
-				logger.log(Logger.INFO, /*getClass().getName()+*/myAgent.getLocalName() +"Receive("+msg.getContent()+"): from :"+msg.getSender().getLocalName());
+				//logger.log(Logger.INFO, /*getClass().getName()+*/myAgent.getLocalName() +"Receive("+msg.getContent()+"): from :"+msg.getSender().getLocalName(), this);
 				//logger.log(Logger.INFO, "ControlerAgent Receive("+myAgent.getLocalName()+"):"+msg.getContent());
+				
+				logger.log(Logger.INFO, "Receive("+msg.getContent()+"): from :"+msg.getSender().getLocalName(), this);
 				
 				switch(msg.getPerformative()){
 					case ACLMessage.CFP:
@@ -127,7 +129,7 @@ class AgentCommercialBehvioursListenerModule extends Behaviour {
 	@Override
 	public int onEnd() {
 		//Message test de log
-		logger.log(Logger.INFO, "Entrée dans onEnd."); 	
+		logger.log(Logger.INFO, "Entrée dans onEnd.", this); 	
 		return super.onEnd();
 	}
 
@@ -173,8 +175,10 @@ class AgentCommercialBehvioursListenerModule extends Behaviour {
 				reply.setPerformative(ACLMessage.CONFIRM);
 				reply.setContent("CONFIRM "+quantityR+" "+priceSend);
 				myAgent.send(reply);
-				logger.log(Logger.INFO, /*getClass().getName()+*/myAgent.getLocalName() +"Receive(Transaction accepted! Send Confirm!): from :"+msg.getSender().getLocalName());
+				
+				//logger.log(Logger.INFO, /*getClass().getName()+*/myAgent.getLocalName() +"Receive(Transaction accepted! Send Confirm!): from :"+msg.getSender().getLocalName(), this);
 				//logger.log(Level.INFO, myAgent.getLocalName()+" :Transaction accepted! Send Confirm!");
+				logger.log(Logger.INFO, "Receive(Transaction accepted! Send Confirm!): from :"+msg.getSender().getLocalName(), this);
 				
 				//Execute transaction
 				myAgentCommercial.sell(quantityR, priceSend);
@@ -182,7 +186,7 @@ class AgentCommercialBehvioursListenerModule extends Behaviour {
 				ACLMessage reply = msg.createReply();
 				reply.setPerformative(ACLMessage.CANCEL);
 				myAgent.send(reply);
-				logger.log(Logger.INFO, myAgent.getLocalName() +"Receive(Transaction refused! Not enough product): from :"+msg.getSender().getLocalName());
+				logger.log(Logger.INFO, myAgent.getLocalName() +"Receive(Transaction refused! Not enough product): from :"+msg.getSender().getLocalName(), this);
 				//logger.log(Level.INFO, myAgent.getLocalName()+" :Transaction refused! Not enough produc!t");
 			}
 /*
@@ -195,4 +199,8 @@ class AgentCommercialBehvioursListenerModule extends Behaviour {
 */
 	}
 	
+	@Override
+	public String toString() {
+		return myAgent.getLocalName();
+	}
 }

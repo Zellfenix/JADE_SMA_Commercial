@@ -46,7 +46,7 @@ public class AgentCommercialBehviours extends TickerBehaviour {
 	public void onStart() {
 		super.onStart();
 		//Message test de log
-		logger.log(Logger.INFO, "Entrée dans onStart.");
+		logger.log(Logger.INFO, "Entrée dans onStart.", this);
 		
 		last_update = new Date();
 	}
@@ -65,7 +65,7 @@ public class AgentCommercialBehviours extends TickerBehaviour {
 		double delta = (((new Date()).getTime() - last_update.getTime()) / 1000.0);
 		
 		//Message test de log
-		logger.log(Logger.FINE, myAgent.getName()+" : Entrée dans onTick. delta="+delta); 
+		logger.log(Logger.FINE, myAgent.getName()+" : Entrée dans onTick. delta="+delta, this); 
 		
 		myAgentCommercial.produce(delta);
 		myAgentCommercial.consomme(delta);
@@ -84,8 +84,13 @@ public class AgentCommercialBehviours extends TickerBehaviour {
 	@Override
 	public int onEnd() {
 		//Message test de log
-		logger.log(Logger.INFO, "Entrée dans onEnd."); 	
+		logger.log(Logger.INFO, "Entrée dans onEnd.", this); 	
 		return super.onEnd();
+	}
+	
+	@Override
+	public String toString() {
+		return myAgent.getLocalName();
 	}
 	
 }
